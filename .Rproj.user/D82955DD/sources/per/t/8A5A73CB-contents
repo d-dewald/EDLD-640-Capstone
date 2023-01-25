@@ -1,0 +1,165 @@
+---
+title             : "EDLD 640 Capstone"
+shorttitle        : "Natural Language Processing for Pedagogy"
+author: 
+  - name          : "Diana DeWald"
+    affiliation   : "1"
+    corresponding : yes    # Define only one corresponding author
+    address       : "336 Straub Hall University of Oregon, Eugene OR, 97403"
+    email         : "ddewald@uoregon.edu"
+  - name          : "Dare Baldwin"
+    affiliation   : "1"
+affiliation:
+  - id            : "1"
+    institution   : "University of Oregon"
+authornote: |
+  Add complete departmental affiliations for each author here. Each new line herein must be indented, like this line.
+  Enter author note here.
+abstract: |
+  One or two sentences providing a **basic introduction** to the field,  comprehensible to a scientist in any discipline.
+  
+  Two to three sentences of **more detailed background**, comprehensible  to scientists in related disciplines.
+  
+  One sentence clearly stating the **general problem** being addressed by  this particular study.
+  
+  One sentence summarizing the main result (with the words "**here we show**" or their equivalent).
+  
+  Two or three sentences explaining what the **main result** reveals in direct comparison to what was thought to be the case previously, or how the  main result adds to previous knowledge.
+  
+  One or two sentences to put the results into a more **general context**.
+  
+  Two or three sentences to provide a **broader perspective**, readily comprehensible to a scientist in any discipline.
+  
+  
+  <!-- https://tinyurl.com/ybremelq -->
+keywords          : "keywords"
+wordcount         : "X"
+bibliography      : ["r-references.bib"]
+floatsintext      : no
+figurelist        : no
+tablelist         : no
+footnotelist      : no
+linenumbers       : yes
+mask              : no
+draft             : no
+documentclass     : "apa6"
+classoption       : "man"
+output            : papaja::apa6_pdf
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r loading libraries, include = FALSE}
+library(papaja)
+r_refs("r-references.bib")
+library(tidyverse)
+library(here)
+library(rio)
+library(tidytext)
+
+
+```
+
+```{r data cleaning, include = FALSE}
+
+# loading datasets
+
+mydata <- import(here("data", "pedagogy_data.xlsx"))
+# devdata <-
+
+# fixing demographic variables
+
+
+# pivoting longer
+mydata <- mydata %>%
+  pivot_longer(cols = starts_with("f"), 
+               names_to = "func", 
+               values_to = "pedagogy")
+
+# renaming two variables in funct column and getting rid of old func column
+fun <- c(fsqueak = "squeak", flight = "light")
+
+mydata$funct <- 
+  as.character(fun[mydata$func])
+
+mydata$func <- NULL
+rm(fun)
+
+```
+
+```{r initial plots, include=FALSE}
+
+# parsing words from the 'pedagogy' (text) column
+tidy_words <- mydata %>%
+  unnest_tokens(word, pedagogy)
+
+# removing numbers
+tidy_words <- tidy_words[-grep("\\b\\d+\\b", tidy_words$word),]
+
+# removing common/under-informative words
+exclu <- tibble(word = c("the", "this", "I"))
+
+tidy_words <- tidy_words %>%
+  anti_join(exclu, by = "word")
+
+
+#plot
+tidy_words %>% 
+  anti_join(stop_words) %>% 
+  count(word, sort = TRUE) %>% 
+  mutate(word = reorder(word, n)) %>% # make y-axis ordered by n
+  slice(1:15) %>% # select only the first 15 rows
+  ggplot(aes(n, word)) +
+  geom_col(fill = "royalblue", alpha = .7) +
+  scale_x_continuous(expand = c(0,0)) +
+  theme_minimal() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.major.x = element_line(color = "gray80")
+  ) +
+  labs(
+    x = "Word Frequency",
+    y = "Word",
+    title = "Top 15 most frequently occurring words across all pedagogy types",
+  )
+
+```
+
+
+```{r analysis-preferences}
+# Seed for random number generation
+set.seed(42)
+knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
+```
+
+
+
+# Methods
+
+
+## Participants
+
+## Material
+
+## Procedure
+
+## Data analysis
+We used `r cite_r("r-references.bib")` for all our analyses.
+
+
+# Results
+
+# Discussion
+
+
+\newpage
+
+# References
+
+\begingroup
+\setlength{\parindent}{-0.5in}
+\setlength{\leftskip}{0.5in}
+
+<div id="refs" custom-style="Bibliography"></div>
+\endgroup
