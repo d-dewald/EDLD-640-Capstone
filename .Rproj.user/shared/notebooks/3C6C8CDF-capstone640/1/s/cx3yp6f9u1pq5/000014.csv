@@ -1,0 +1,17 @@
+"0","mydata <- mydata %>%
+  pivot_longer(cols = starts_with(""f""), 
+               names_to = ""func"", 
+               values_to = ""pedagogy"")
+
+# renaming two variables in funct column and getting rid of old func column
+fun <- c(fsqueak = ""squeak"", flight = ""light"")
+
+mydata$funct <- 
+  as.character(fun[mydata$func])
+
+mydata$func <- NULL
+rm(fun); rm(func)
+"
+"2","Warning in rm(func) :"
+"2"," object 'func' not found
+"

@@ -1,0 +1,22 @@
+---
+title: "Leave empty"
+author: "Leave empty"
+date: "Leave empty"
+output: ioslides_presentation
+---
+
+---
+
+- [A] Progress this week
+
+  -created Rmd & github: 
+  
+  -cleaned data, preliminary descriptives
+
+- [B] Revisions to product
+
+  -sample size smaller than anticipated; so I plan to incorporate...
+
+- [C] Plan for next week & beyond
+
+Note. You can add code chunks, plots, or images as necessary to your presentation. Please make sure it doesn't depend on any fancy stuff so I can reproduce it on my computer when putting slides together.
