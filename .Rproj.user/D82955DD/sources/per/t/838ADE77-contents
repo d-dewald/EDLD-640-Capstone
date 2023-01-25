@@ -1,0 +1,22 @@
+---
+title: "Leave empty"
+author: "Leave empty"
+date: "Leave empty"
+output: ioslides_presentation
+---
+---
+- [A] Progress this week
+    - created project: https://github.com/d-dewald/EDLD-640-Capstone
+    - preliminary analyses (available in 'plots' folder on github)
+    - created list of new text samples (see B below), available in 'data' folder on github
+- [B] Revisions to product
+    - text sample size smaller than anticipated(n=155); so I will incorporate additional pedagogy examples from pre-existing studies for text analysis
+- [C] Plan for next week & beyond
+     - organize child outcome data (total play time, time w/ target function, # properties discovered)
+     - continue organizing pedagogy data (see B above)
+     - train initial ML model predicting outcomes (above) based upon pedagogy-type
+  
+     
+     
+     
+     
