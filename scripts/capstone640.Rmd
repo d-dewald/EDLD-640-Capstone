@@ -332,6 +332,29 @@ ggplot(data = sentbars) +
        x = "Change over Time (Each Bar is 25 Lines of Text)",
        y = "Sentiment Score")
 
+# parts of speech tagging
+## load udpipe
+library(udpipe)
+library(kableExtra)
+
+## download the "english" model
+udmodel <- udpipe_download_model(language = "english")
+
+##let's load the "english' model
+udmodel <- udpipe_load_model(file = udmodel$file_model)
+
+
+pos <- udpipe_annotate(udmodel, 
+                       x = unigrams_cleaned$word)
+
+pos <- as.data.frame(pos)
+
+## how can get a count of words by parts of speech using the following data.
+table(pos$upos)
+
+pos <- cbind_dependencies(pos, type = "parent")
+nominalsubject <- subset(pos, dep_rel %in% c("nsubj"))
+nominalsubject <- nominalsubject[, c("dep_rel", "token", "token_parent")]
 ```
 
 # Methods
