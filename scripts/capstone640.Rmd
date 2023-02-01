@@ -56,6 +56,9 @@ library(tidyverse)
 library(here)
 library(rio)
 library(tidytext)
+library(dplyr)
+library(tidyr)
+
 
 
 ```
@@ -65,6 +68,7 @@ library(tidytext)
 # loading datasets
 
 mydata <- import(here("data", "pedagogy_data.xlsx"))
+textdata <- import(here("data", "text_data.xlsx"))
 # devdata <-
 
 # fixing demographic variables
@@ -134,6 +138,201 @@ knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
 ```
 
 
+```{r nlp start}
+
+# tokenizing
+unigrams = textdata %>% unnest_tokens(word, text, token = "ngrams", n = 1)
+bigrams = textdata %>% unnest_tokens(bigram, text, token = "ngrams", n = 2)
+
+# no stop words
+unigrams_cleaned = unigrams %>%
+  filter(!word %in% stop_words$word)
+
+# stemming
+library(SnowballC)
+
+unigrams_cleaned = unigrams %>%
+  filter(!word %in% stop_words$word)%>%
+  mutate(word = wordStem(word))
+
+# lemmatization
+library(textstem)
+
+unigrams_cleaned = unigrams %>%
+  filter(!word %in% stop_words$word)%>%
+  mutate(word = lemmatize_words(word))
+
+# cleaning n-grams
+
+library(tm)
+
+ngramsclean <- textdata %>%
+  unnest_tokens(word, text, token = "ngrams", n = 1)%>%
+  filter(!word %in% stop_words$word)%>% # removing stop words
+  mutate(word = lemmatize_words(word))%>% 
+  group_by(id)%>%
+  summarise(text = paste(word, collapse = " "))%>%
+  unnest_tokens(word, text, token = "ngrams", n = 3)
+
+
+# visualing: word cloud
+library(wordcloud)
+
+tokens = textdata %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words)
+
+# top words
+word_count = tokens%>%
+  group_by(word)%>%
+  summarise(count = n())%>%
+  arrange(desc(count))%>%
+  slice(1:10)
+
+
+# word cloud--zoom in
+cloud <- tokens %>%
+  group_by(source, word) %>%
+  summarise(count = n())%>%
+  arrange(desc(count))%>%
+  slice(1:10)
+
+
+ggplot(data = cloud)+
+  geom_bar(aes(x = word, y = count, fill = source), stat = "identity", position = "dodge")+
+  theme_classic()
+  
+
+wordcloud(tokens$word, max.words = 75, colors=brewer.pal(6, "Dark2"))
+
+# word embeddings
+library(text2vec)
+
+text8_file = "~/text8"
+
+unzip ("text8.zip", files = "text8", exdir = "~/")
+
+wiki = readLines(text8_file, n = 1, warn = FALSE)
+
+# Create iterator over tokens
+tokens <- space_tokenizer(unigrams_cleaned$word) 
+
+# Create vocabulary. Terms will be unigrams (simple words).
+it = itoken(tokens, progressbar = FALSE)
+vocab <- create_vocabulary(it)
+
+vocab <- prune_vocabulary(vocab, term_count_min = 5L)
+vectorizer <- vocab_vectorizer(vocab)
+
+tcm <- create_tcm(it, vectorizer, skip_grams_window = 5L)
+
+
+glove = GlobalVectors$new(rank = 50, x_max = 10)
+# shakes_wv_main = glove$fit_transform(tcm, n_iter = 10, convergence_tol = 0.001)
+
+# wv_context = glove$components
+# word_vectors = shakes_wv_main  + t(wv_context)
+
+# berlin = word_vectors["paris", , drop = FALSE] -
+#  word_vectors["france", , drop = FALSE] +
+#  word_vectors["germany", , drop = FALSE]
+
+# berlin_cos_sim = sim2(x = word_vectors, y = berlin, method = "cosine", norm = "l2")
+# head(sort(berlin_cos_sim[,1], decreasing = TRUE), 5)
+
+
+# topic modelling--more work to do
+library(topicmodels)
+
+
+
+
+
+
+
+# sentiment analysis
+library(RColorBrewer)
+
+
+sentiment = textdata %>% #this allows us to retain the row number/the tweet
+  unnest_tokens(word, text)%>% # this unnests the tweets into words
+  anti_join(stop_words)%>% #removes common words (stop words)
+  left_join(get_sentiments("bing"))
+
+# word cloud
+positive_sentiment = sentiment%>% filter(!is.na(sentiment),
+                                         sentiment == 'positive') 
+
+wordcloud(positive_sentiment$word, random.order = FALSE, colors=brewer.pal(6, "Dark2"))
+
+negative_sentiment = sentiment%>% filter(!is.na(sentiment),
+                                         sentiment == 'negative') 
+
+wordcloud(negative_sentiment$word, random.order = FALSE, colors=brewer.pal(6, "Dark2"))
+
+#### sentiment radar chart
+
+library(fmsb)
+library(tidyr)
+library(textdata)
+
+nrc_sentiment = textdata %>% #this allows us to retain the row number/the tweet
+  unnest_tokens(word, text)%>% # this unnests the tweets into words
+  anti_join(stop_words)%>% #removes common words (stop words)
+  left_join(get_sentiments("nrc"))%>%
+  filter(!is.na(sentiment))
+
+nrc_sentiment = nrc_sentiment%>%
+  group_by(sentiment)%>%
+  summarise(count = n())%>%
+  spread(sentiment, count)
+
+# create rows with the min and max to be plotted
+nrc_sentiment <- rbind(rep(400,10) , rep(0,10), nrc_sentiment)
+
+radarchart(nrc_sentiment, axistype=1 , 
+           pcol=rgb(0.2,0.5,0.5,0.9) , pfcol=rgb(0.2,0.5,0.5,0.5) , plwd=4 , 
+           cglcol="grey", cglty=1, axislabcol="grey", caxislabels=seq(0,20,5), cglwd=0.8,
+           vlcex=0.8 )
+
+#### sentiment over time
+
+library(gutenbergr)
+library(tidyr)
+library(ggplot2)
+
+
+words <- textdata %>%
+  mutate(linenumber = row_number())%>%
+  unnest_tokens(word, text)
+
+sentbars = words %>%
+  inner_join(get_sentiments("bing"))%>%
+  # %/% performs integer divison, rounding down to the nearest whole number
+  mutate(index = linenumber %/% 25)%>% 
+  group_by(index, sentiment)%>%
+  summarise(count = n())%>%
+  spread(sentiment, count, fill = 0) %>%
+  mutate(sentiment = positive - negative,
+         sentiment_group = ifelse(sentiment > 0, "pos", "neg"))%>%
+  ungroup()
+
+# the plot itself
+ggplot(data = sentbars) +
+  geom_bar(aes(x = index, y = sentiment, fill = sentiment_group), stat = "identity")+
+  theme_classic()+
+  theme(
+    legend.position = "none",
+    axis.ticks.x = element_blank(),
+    axis.line.x = element_blank(),
+    axis.text.x = element_blank()
+  )+
+  scale_fill_manual(values = c("darkred", "darkgreen"))+
+  labs(title = "The Sentiment of Pedagogy",
+       x = "Change over Time (Each Bar is 25 Lines of Text)",
+       y = "Sentiment Score")
+
+```
 
 # Methods
 
