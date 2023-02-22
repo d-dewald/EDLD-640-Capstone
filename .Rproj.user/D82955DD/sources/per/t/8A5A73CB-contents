@@ -12,28 +12,19 @@ author:
 affiliation:
   - id            : "1"
     institution   : "University of Oregon"
-authornote: |
-  Add complete departmental affiliations for each author here. Each new line herein must be indented, like this line.
-  Enter author note here.
+
 abstract: |
-  One or two sentences providing a **basic introduction** to the field,  comprehensible to a scientist in any discipline.
+
+  (will change wording to past tense once project is completed, and will add in results and discussion summary).. 
   
-  Two to three sentences of **more detailed background**, comprehensible  to scientists in related disciplines.
+  How is young children's exploration impacted by adult pedagogy? Can we create Machine Learning models to predict how a child will explore the causal features of an object based upon the pedagogy they are exposed to? Our goal is to establish predictive models of preschoolers' causal learning outcomes within educational settings based upon teachers' pedagogical styles. Using pre-existing samples of pedagogy and child outcomes, we...
   
-  One sentence clearly stating the **general problem** being addressed by  this particular study.
-  
-  One sentence summarizing the main result (with the words "**here we show**" or their equivalent).
-  
-  Two or three sentences explaining what the **main result** reveals in direct comparison to what was thought to be the case previously, or how the  main result adds to previous knowledge.
-  
-  One or two sentences to put the results into a more **general context**.
-  
-  Two or three sentences to provide a **broader perspective**, readily comprehensible to a scientist in any discipline.
+  The rationale for this investigation is that determining the pedagogy-inclusive models predicting children's behavior in educational settings will allow us to predict cases where adult-directed instruction creates positive learning outcomes.
   
   
   <!-- https://tinyurl.com/ybremelq -->
-keywords          : "keywords"
-wordcount         : "X"
+keywords          : "causal learning models, pedagogy, text analysis"
+wordcount         : "916"
 bibliography      : ["r-references.bib"]
 floatsintext      : no
 figurelist        : no
@@ -49,7 +40,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r loading libraries, include = FALSE}
+```{r loading libraries, include = FALSE, warning= FALSE}
 library(papaja)
 r_refs("r-references.bib")
 library(tidyverse)
@@ -77,7 +68,23 @@ library(pastecs)
 
 ```
 
-```{r data cleaning, include = FALSE}
+# Introduction
+  Developmentalists and educators have long debated the benefits of child-directed (Montessori style) exploration contra adult-directed (pedagogical) instruction on learning outcomes. The truth is that both provide valuable learning opportunities, but questions of how, in what cases, and for which individuals remain fuzzy. While young children (age 3-6) often re-structure their hypotheses about the world based upon self-directed exploration á la Montessori, there are many subjects children cannot master without adult-directed pedagogical guidance (e.g., novel object labels, the alphabet, color and shape labels, historical events, the existence of entities such as germs, etc.). Such subjects are often culturally and linguistically bound, but even causal learning related to the physical properties of objects and entities can benefit from adult-directed pedagogy. Clarifying the extent to which pedagogy supports—and in some cases diminishes—effective causal learning is essential for a) informing teaching strategies in a time when many preparatory schools in the U.S. suffer from a lack of funding and teacher support [@SRCD; @NIERR], and b) elevating early education outcomes following relative dips in school preparedness over the past three years (Jalongo, 2021; [@gonzalez2022school]).
+  In early childhood (age 3-6), children learn about causality through both self-directed and adult-directed methods. In recent years, adult-directed early education programs have undergone substantial changes in the U.S., yet the vast majority of causal learning models remain focused on child-directed learning outcomes. Those who have sought to address the impact of adult-directed pedagogy on causal learning describe a pedagogical trade-off model. This model proposes that adult instruction increases the proportion of time children spend exploring an object’s pedagogy-relevant properties but limits their investigation of other properties. Conversely, child-directed exploration is understood to produce broader discovery of the complete set of an object’s causal properties but diminish the time spent investigating any particular property. While such behavioral outcomes are established, little is known about the cognitive mechanisms that drive this pedagogical trade-off, how to computationally map the trade-off, and the extent to which computational models capture individual differences in learning outcomes. Failing to assess the differential impact of pedagogy on causal learning during early childhood limits educators to theories that only take child-directed learning into account. 
+  While computational models of children’s causal learning exist (e.g., Kosoy et al., 2022; Gopnik et al. 2004; Sobel, 2014; Oudeyer & Smith, 2014; Twomey & Westermann, 2016; Bonawitz et al., 2022; Colantonio et al., in press), there is no pre-existing model which factors in pedagogy-type as a predictor of learning behaviors. By utilizing machine learning to train models both with-and-without the presence of diverse pedagogy categories, we can greatly expand the predictive power of causal learning models, which are currently limited to child-directed learning predictors. 
+  Our long-term goal is to establish predictive models of preschoolers’ causal learning outcomes within naturalistic settings based upon teachers’ pedagogical styles. The overall objective is to elucidate how interactions between pedagogy type, attentional patterns, and exploratory behavior inform competing computational models of causal learning outcomes and to train a best-performing model via machine learning. Our central hypotheses is as follows: causal learning models will perform best when taking granular pedagogy types into account. We aim to create and test competing computational models related to the interaction between pedagogy type and causal learning. We predict that prior computational models of causal learning that contain fewer pedagogy categories (or do not take pedagogy into account) will perform worse than pedagogy-diverse models of causal learning. Upon completion, our expected outcomes are to have established the interaction between adult instruction style and children’s visual attention processes and exploratory behaviors within physical causal learning domains. These results will a) add valuable evidence to clarify developmentalists’ theoretical and computational accounts of causal learning, and b) pave a way forward to support educators in developing effective curriculum for young students during a time of immense educational resource shortages.
+
+# Methods
+  In Fall of 2022, we conducted a survey of undergraduate students (N = 168) at the University of Oregon, asking participants to report how they would teach a child about the causal properties of a novel object. Participants were randomly sorted into 2 conditions. In the 'enhance' condition, participants were asked to generate pedagogy for two object properties intended to produce broad exploratory behaviors from a child (ex: "What would you say to introduce this toy in a way that encourages wide-ranging exploration?"). In the 'constrain' condition, participants were asked to generate pedagogy intended to produce limited exploratory behaviors from a child (ex: "What would you say to introduce this toy in a way that discourages wide-ranging exploration?"). 
+  
+  We then (in the works) created a coding classifier system pairing participant-generated pedagogy with 7 pedagogy-type categories from previous research. These 7 pedagogy categories were linked to specific child outcomes from prior studies conducted by us as well as other labs. Using our child data outcome data paired with the coded participant-generated pedagogy, we are creating models to capture how well participants in our survey generated pedagogy which was most likely to produce the desired child outcomes.
+
+### outline: describe models, coding system, variables, etc.
+
+### Coding system: based on rank order created for gen survey
+
+
+```{r data cleaning, warning = FALSE}
 
 # loading datasets
 
@@ -105,7 +112,7 @@ rm(fun)
 
 ```
 
-```{r initial plots, include=FALSE}
+```{r initial plots, warning = FALSE}
 
 # parsing words from the 'pedagogy' (text) column
 tidy_words <- mydata %>%
@@ -145,14 +152,14 @@ tidy_words %>%
 ```
 
 
-```{r analysis-preferences}
+```{r analysis-preferences, include = FALSE, warning = FALSE}
 # Seed for random number generation
 set.seed(42)
 knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
 ```
 
 
-```{r nlp start}
+```{r nlp start, warning = FALSE}
 
 # tokenizing
 unigrams = textdata %>% unnest_tokens(word, text, token = "ngrams", n = 1)
@@ -188,7 +195,11 @@ ngramsclean <- textdata %>%
   summarise(text = paste(word, collapse = " "))%>%
   unnest_tokens(word, text, token = "ngrams", n = 3)
 
+```
 
+### Wordcloud for overall sentiment
+
+```{r, warning = FALSE}
 # visualing: word cloud
 library(wordcloud)
 
@@ -210,11 +221,6 @@ cloud <- tokens %>%
   summarise(count = n())%>%
   arrange(desc(count))%>%
   slice(1:10)
-
-
-ggplot(data = cloud)+
-  geom_bar(aes(x = word, y = count, fill = source), stat = "identity", position = "dodge")+
-  theme_classic()
   
 
 wordcloud(tokens$word, max.words = 75, colors=brewer.pal(6, "Dark2"))
@@ -222,11 +228,11 @@ wordcloud(tokens$word, max.words = 75, colors=brewer.pal(6, "Dark2"))
 # word embeddings
 library(text2vec)
 
-text8_file = "~/text8"
+# text8_file = "~/text8"
 
-unzip ("text8.zip", files = "text8", exdir = "~/")
+# unzip ("text8.zip", files = "text8", exdir = "~/")
 
-wiki = readLines(text8_file, n = 1, warn = FALSE)
+# wiki = readLines(text8_file, n = 1, warn = FALSE)
 
 # Create iterator over tokens
 tokens <- space_tokenizer(unigrams_cleaned$word) 
@@ -263,7 +269,11 @@ library(topicmodels)
 
 
 
+```
 
+### wordcloud for positive sentiment
+
+```{r, warning=FALSE}
 # sentiment analysis
 library(RColorBrewer)
 
@@ -279,11 +289,22 @@ positive_sentiment = sentiment%>% filter(!is.na(sentiment),
 
 wordcloud(positive_sentiment$word, random.order = FALSE, colors=brewer.pal(6, "Dark2"))
 
+```
+
+### Wordcloud for negative sentiment
+
+```{r, warning = FALSE}
+
 negative_sentiment = sentiment%>% filter(!is.na(sentiment),
                                          sentiment == 'negative') 
 
 wordcloud(negative_sentiment$word, random.order = FALSE, colors=brewer.pal(6, "Dark2"))
+```
 
+
+### Sentiment Radar Chart
+
+```{r, warning=FALSE}
 #### sentiment radar chart
 
 library(fmsb)
@@ -371,7 +392,18 @@ nominalsubject <- subset(pos, dep_rel %in% c("nsubj"))
 nominalsubject <- nominalsubject[, c("dep_rel", "token", "token_parent")]
 ```
 
-```{r}
+```{r, warning = FALSE}
+ggplot(data = cloud)+
+  geom_bar(aes(x = word, y = count, fill = source), stat = "identity", position = "dodge")+
+  theme_classic()
+
+
+```
+
+
+## Data analysis: Logistic regression (in progress)
+
+```{r, include = TRUE, warning= FALSE, include=FALSE}
 
 omsi <- import(here("data", "omsidata.xlsx"))
 
@@ -394,69 +426,53 @@ blueprint <- recipe(x  = omsi,
  
 blueprint
 
-prepare <- prep(blueprint, training = omsi)
- 
-prepare_set_jee
 
-baked <- bake(prepare_set_jee, new_data = set_data)
+
+
+
+# prepare <- prep(blueprint, training = omsi)
+ 
+# prepare_set_jee
+
+# baked <- bake(prepare_set_jee, new_data = set_data)
 
 
 
 # preparing blueprint for AT
 
-blueprint_set_at <- recipe(x  = set_data,
-                    vars  = c(categorical, outcome_at, ID),
-                    roles = c(rep('predictor',129),'outcome','ID')) %>%
-  step_indicate_na(all_of(categorical)) %>%
-  step_zv(all_of(categorical)) %>%
-   step_num2factor(AT,
-                  transform = function(x) x + 1,
-                  levels=c('High','Low'))
+# blueprint_set_at <- recipe(x  = set_data,
+#                    vars  = c(categorical, outcome_at, ID),
+#                    roles = c(rep('predictor',129),'outcome','ID')) %>%
+#  step_indicate_na(all_of(categorical)) %>%
+#  step_zv(all_of(categorical)) %>%
+#   step_num2factor(AT,
+#                  transform = function(x) x + 1,
+#                  levels=c('High','Low'))
  
 
-blueprint_set_at
+# blueprint_set_at
 
  
-prepare_set_at <- prep(blueprint_set_jee, training = set_data)
+# prepare_set_at <- prep(blueprint_set_jee, training = set_data)
  
-prepare_set_at
+# prepare_set_at
 
-baked_set_at <- bake(prepare_set_at, new_data = set_data)
+# baked_set_at <- bake(prepare_set_at, new_data = set_data)
 
 
 ```
 
-# Introduction
-
-  Developmentalists and educators have long debated the benefits of child-directed (Montessori style) exploration contra adult-directed (pedagogical) instruction on learning outcomes. The truth is that both provide valuable learning opportunities, but questions of how, in what cases, and for which individuals remain fuzzy. While young children (age 3-6) often re-structure their hypotheses about the world based upon self-directed exploration á la Montessori, there are many subjects children cannot master without adult-directed pedagogical guidance (e.g., novel object labels, the alphabet, color and shape labels, historical events, the existence of entities such as germs, etc.). Such subjects are often culturally and linguistically bound, but even causal learning related to the physical properties of objects and entities can benefit from adult-directed pedagogy. Clarifying the extent to which pedagogy supports—and in some cases diminishes—effective causal learning is essential for a) informing teaching strategies in a time when many preparatory schools in the U.S. suffer from a lack of funding and teacher support (SRCD Press Release, 2022; NIERR Special Report, 2022), and b) elevating early education outcomes following relative dips in school preparedness over the past three years (Jalongo, 2021; González et al., 2022).
-  In early childhood (age 3-6), children learn about causality through both self-directed and adult-directed methods. In recent years, adult-directed early education programs have undergone substantial changes in the U.S., yet the vast majority of causal learning models remain focused on child-directed learning outcomes. Those who have sought to address the impact of adult-directed pedagogy on causal learning describe a pedagogical trade-off model. This model proposes that adult instruction increases the proportion of time children spend exploring an object’s pedagogy-relevant properties but limits their investigation of other properties. Conversely, child-directed exploration is understood to produce broader discovery of the complete set of an object’s causal properties but diminish the time spent investigating any particular property. While such behavioral outcomes are established, little is known about the cognitive mechanisms that drive this pedagogical trade-off, how to computationally map the trade-off, and the extent to which computational models capture individual differences in learning outcomes. Failing to assess the differential impact of pedagogy on causal learning during early childhood limits educators to theories that only take child-directed learning into account. 
-  While computational models of children’s causal learning exist (e.g., Kosoy et al., 2022; Gopnik et al. 2004; Sobel, 2014; Oudeyer & Smith, 2014; Twomey & Westermann, 2016; Bonawitz et al., 2022; Colantonio et al., in press), there is no pre-existing model which factors in pedagogy-type as a predictor of learning behaviors. By utilizing machine learning to train models both with-and-without the presence of diverse pedagogy categories, we can greatly expand the predictive power of causal learning models, which are currently limited to child-directed learning predictors. 
-  Our long-term goal is to establish predictive models of preschoolers’ causal learning outcomes within naturalistic settings based upon teachers’ pedagogical styles. The overall objective is to elucidate how interactions between pedagogy type, attentional patterns, and exploratory behavior inform competing computational models of causal learning outcomes and to train a best-performing model via machine learning. Our central hypotheses is as follows: causal learning models will perform best when taking granular pedagogy types into account. We aim to create and test competing computational models related to the interaction between pedagogy type and causal learning. We predict that prior computational models of causal learning that contain fewer pedagogy categories (or do not take pedagogy into account) will perform worse than pedagogy-diverse models of causal learning. Upon completion, our expected outcomes are to have established the interaction between adult instruction style and children’s visual attention processes and exploratory behaviors within physical causal learning domains. These results will a) add valuable evidence to clarify developmentalists’ theoretical and computational accounts of causal learning, and b) pave a way forward to support educators in developing effective curriculum for young students during a time of immense educational resource shortages.
-
-# Methods
-
-### outline: describe models, coding system, variables, etc.
-
-### Coding system: based on rank order created for gen survey
-
-## Participants
-
-## Material
-
-## Procedure
-
-## Data analysis
-We used `r cite_r("r-references.bib")` for all our analyses.
 
 
-# Results
+# Results (in progress)
 
-# Discussion
+# Discussion (in progress)
 
 
 \newpage
 
 # References
+We used packages from `r cite_r("r-references.bib")` for all our analyses.
 
 \begingroup
 \setlength{\parindent}{-0.5in}

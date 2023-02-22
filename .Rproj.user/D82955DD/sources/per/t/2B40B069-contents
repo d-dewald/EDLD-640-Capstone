@@ -1,0 +1,19 @@
+---
+title: "Leave empty"
+author: "Leave empty"
+date: "Leave empty"
+output: ioslides_presentation
+---
+---
+- Progress this week
+    - wrote abstract & methods
+    - ran several  logistic regression models 
+    - can show pdf: https://github.com/d-dewald/EDLD652_hw/blob/main/EDLD652_hw.pdf 
+    - currently (still) exploring ML models for non-binary outcomes
+-  Revisions to product: none this week
+- Plan for coming week
+    - Outline results and discussion
+    - still working on coding system for ped outcomes
+    - decide one figures & code to include in manuscript
+    
+    
