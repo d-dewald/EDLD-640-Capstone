@@ -1,0 +1,28 @@
+{
+    "id": "908BA067",
+    "path": null,
+    "project_path": null,
+    "type": "object_explorer",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1677105297804.0,
+    "source_on_save": false,
+    "relative_order": 6,
+    "properties": {
+        "id": "16fc9cea6e0a4797b152d1c359d8a277",
+        "name": "omsi_indices",
+        "title": "omsi_indices",
+        "language": "R",
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 2313717177200,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1677105297804,
+    "read_only": false,
+    "read_only_alternatives": []
+}

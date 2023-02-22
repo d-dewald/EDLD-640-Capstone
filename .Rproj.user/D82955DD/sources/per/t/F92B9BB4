@@ -3,24 +3,24 @@
     "path": "~/Oregon/Courses/datascience spec/edld_640/EDLD-640-Capstone/r-references.bib",
     "project_path": "r-references.bib",
     "type": "text",
-    "hash": "3021129924",
+    "hash": "3711714551",
     "contents": "",
     "dirty": false,
     "created": 1677096270795.0,
     "source_on_save": false,
-    "relative_order": 5,
+    "relative_order": 3,
     "properties": {
         "source_window_id": "",
         "Source": "Source",
         "cursorPosition": "132,0",
-        "scrollLine": "115"
+        "scrollLine": "0"
     },
     "folds": "",
-    "lastKnownWriteTime": 1677102753,
+    "lastKnownWriteTime": 1677103303,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1677102753831,
+    "last_content_update": 1677103303,
     "read_only": false,
     "read_only_alternatives": []
 }

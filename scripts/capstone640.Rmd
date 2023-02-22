@@ -24,7 +24,7 @@ abstract: |
   
   <!-- https://tinyurl.com/ybremelq -->
 keywords          : "causal learning models, pedagogy, text analysis"
-wordcount         : "916"
+wordcount         : "944"
 bibliography      : ["r-references.bib"]
 floatsintext      : no
 figurelist        : no
@@ -79,7 +79,7 @@ library(pastecs)
   
   We then (in the works) created a coding classifier system pairing participant-generated pedagogy with 7 pedagogy-type categories from previous research. These 7 pedagogy categories were linked to specific child outcomes from prior studies conducted by us as well as other labs. Using our child data outcome data paired with the coded participant-generated pedagogy, we are creating models to capture how well participants in our survey generated pedagogy which was most likely to produce the desired child outcomes.
 
-### outline: describe models, coding system, variables, etc.
+### outline: describe models (see whether bagged tree or random forest model better predicts the sentiment of pedagogy--use this to see if some pedagogy sentiment groups are tied to certain child outcomes), coding system, variables, etc.
 
 ### Coding system: based on rank order created for gen survey
 
@@ -265,10 +265,6 @@ glove = GlobalVectors$new(rank = 50, x_max = 10)
 library(topicmodels)
 
 
-
-
-
-
 ```
 
 ### wordcloud for positive sentiment
@@ -311,7 +307,7 @@ library(fmsb)
 library(tidyr)
 library(textdata)
 
-nrc_sentiment = textdata %>% #this allows us to retain the row number/the tweet
+nrc_sentiment = textdata %>% #this allows us to retain the row number
   unnest_tokens(word, text)%>% # this unnests the tweets into words
   anti_join(stop_words)%>% #removes common words (stop words)
   left_join(get_sentiments("nrc"))%>%
@@ -409,56 +405,84 @@ omsi <- import(here("data", "omsidata.xlsx"))
 
 omsi$condition <- as.factor(omsi$condition)
 
-outcome_time <- c('total_time')
+outcome <- c('squeaker_discovered')
 
-ID <- c('participantID')
+ID <- c('participant')
 
 categorical <- c('condition')
 
+# Problem: currently getting an error when I try to train the model.The error is coming from step_medianimpute(). step_medianimpute() requires all the variables to be numeric but it is being passed factor variables with all_predictors().One way to fix this problem is by rearranging your recipe to create dummy variables before you impute.need to dummy code
+
 blueprint <- recipe(x  = omsi,
-                    vars  = c(categorical, outcome_time, ID),
+                    vars  = c(categorical, outcome, ID),
                     roles = c(rep('predictor'),'outcome','ID')) %>%
   step_indicate_na(all_of(categorical)) %>%
   step_zv(all_of(categorical)) %>%
-    step_num2factor(condition,
+    step_num2factor(outcome,
                   transform = function(x) x + 1,
-                  levels=c('baseline','interrupted', 'naive', 'ped1'))
+                  levels=c('Y', 'N')) %>%
+  step_num2factor(condition, 
+                  transform = function(x) x + 1,
+                  levels=c('ped1', 'baseline', 'interrupted', 'naive'))
  
 blueprint
 
 
+# let's split into testing and training sets
+# Let the training data have the 80% of cases and the test data have the 20% of the cases.
+
+set.seed(11102021)  # for reproducibility
+  
+ped     <- sample(1:nrow(omsi), round(nrow(omsi) * 0.8))
+ped_train  <- omsi[ped, ]
+ped_test  <- omsi[-ped, ]
 
 
+# 10 fold cross validation
 
-# prepare <- prep(blueprint, training = omsi)
+
+set.seed(11152021) # for reproducibility
+
+omsi_tr = ped_train[sample(nrow(ped_train)),]
+
+  # Creating 10 folds with equal size
+
+folds_omsi = cut(seq(1,nrow(omsi_tr)),breaks=10,labels=FALSE)
+  
+# code currently providing error when I try to create an empty list
+  # Creating the list for each fold 
+# omsi_indices <- vector(mode = 'list',length = 10)
+#      for(i in 1:10){
+#        omsi_indices[[i]] <- which(folds_omsi!=i)
+#      }
+    
+set.seed(125)
+
+ cv <- trainControl(method    = "cv",
+                      classProbs      = TRUE,
+                   summaryFunction = mnLogLoss,
+                   number = 10)
  
-# prepare_set_jee
+    
+      
+# Train the model
+  
+# ped_mod <- caret::train(blueprint, 
+#                          data      = omsi_tr, 
+#                          method    = "glm",
+#                          family    = 'binomial',
+#                          metric    = 'logLoss',
+#                          trControl = cv)
 
-# baked <- bake(prepare_set_jee, new_data = set_data)
+# ped_mod
 
+# Evaluate the model on the test data
 
+# Predict the probabilities for the observations in the test dataset
 
-# preparing blueprint for AT
+# predicted_test <- predict(ped_mod, omsi_test, type='prob')
 
-# blueprint_set_at <- recipe(x  = set_data,
-#                    vars  = c(categorical, outcome_at, ID),
-#                    roles = c(rep('predictor',129),'outcome','ID')) %>%
-#  step_indicate_na(all_of(categorical)) %>%
-#  step_zv(all_of(categorical)) %>%
-#   step_num2factor(AT,
-#                  transform = function(x) x + 1,
-#                  levels=c('High','Low'))
- 
-
-# blueprint_set_at
-
- 
-# prepare_set_at <- prep(blueprint_set_jee, training = set_data)
- 
-# prepare_set_at
-
-# baked_set_at <- bake(prepare_set_at, new_data = set_data)
-
+# head(predicted_test)
 
 ```
 
