@@ -59,6 +59,20 @@ library(tidytext)
 library(dplyr)
 library(tidyr)
 
+library(devtools)
+library(tinytex)
+library(readr)
+library(magrittr)
+library(recipes)
+library(psych)
+library(finalfit)
+library(caret)
+library(glmnet)
+library(recipes)
+library(cutpointr)
+library(kableExtra)
+library(pastecs)
+
 
 
 ```
@@ -357,8 +371,73 @@ nominalsubject <- subset(pos, dep_rel %in% c("nsubj"))
 nominalsubject <- nominalsubject[, c("dep_rel", "token", "token_parent")]
 ```
 
+```{r}
+
+omsi <- import(here("data", "omsidata.xlsx"))
+
+omsi$condition <- as.factor(omsi$condition)
+
+outcome_time <- c('total_time')
+
+ID <- c('participantID')
+
+categorical <- c('condition')
+
+blueprint <- recipe(x  = omsi,
+                    vars  = c(categorical, outcome_time, ID),
+                    roles = c(rep('predictor'),'outcome','ID')) %>%
+  step_indicate_na(all_of(categorical)) %>%
+  step_zv(all_of(categorical)) %>%
+    step_num2factor(condition,
+                  transform = function(x) x + 1,
+                  levels=c('baseline','interrupted', 'naive', 'ped1'))
+ 
+blueprint
+
+prepare <- prep(blueprint, training = omsi)
+ 
+prepare_set_jee
+
+baked <- bake(prepare_set_jee, new_data = set_data)
+
+
+
+# preparing blueprint for AT
+
+blueprint_set_at <- recipe(x  = set_data,
+                    vars  = c(categorical, outcome_at, ID),
+                    roles = c(rep('predictor',129),'outcome','ID')) %>%
+  step_indicate_na(all_of(categorical)) %>%
+  step_zv(all_of(categorical)) %>%
+   step_num2factor(AT,
+                  transform = function(x) x + 1,
+                  levels=c('High','Low'))
+ 
+
+blueprint_set_at
+
+ 
+prepare_set_at <- prep(blueprint_set_jee, training = set_data)
+ 
+prepare_set_at
+
+baked_set_at <- bake(prepare_set_at, new_data = set_data)
+
+
+```
+
+# Introduction
+
+  Developmentalists and educators have long debated the benefits of child-directed (Montessori style) exploration contra adult-directed (pedagogical) instruction on learning outcomes. The truth is that both provide valuable learning opportunities, but questions of how, in what cases, and for which individuals remain fuzzy. While young children (age 3-6) often re-structure their hypotheses about the world based upon self-directed exploration á la Montessori, there are many subjects children cannot master without adult-directed pedagogical guidance (e.g., novel object labels, the alphabet, color and shape labels, historical events, the existence of entities such as germs, etc.). Such subjects are often culturally and linguistically bound, but even causal learning related to the physical properties of objects and entities can benefit from adult-directed pedagogy. Clarifying the extent to which pedagogy supports—and in some cases diminishes—effective causal learning is essential for a) informing teaching strategies in a time when many preparatory schools in the U.S. suffer from a lack of funding and teacher support (SRCD Press Release, 2022; NIERR Special Report, 2022), and b) elevating early education outcomes following relative dips in school preparedness over the past three years (Jalongo, 2021; González et al., 2022).
+  In early childhood (age 3-6), children learn about causality through both self-directed and adult-directed methods. In recent years, adult-directed early education programs have undergone substantial changes in the U.S., yet the vast majority of causal learning models remain focused on child-directed learning outcomes. Those who have sought to address the impact of adult-directed pedagogy on causal learning describe a pedagogical trade-off model. This model proposes that adult instruction increases the proportion of time children spend exploring an object’s pedagogy-relevant properties but limits their investigation of other properties. Conversely, child-directed exploration is understood to produce broader discovery of the complete set of an object’s causal properties but diminish the time spent investigating any particular property. While such behavioral outcomes are established, little is known about the cognitive mechanisms that drive this pedagogical trade-off, how to computationally map the trade-off, and the extent to which computational models capture individual differences in learning outcomes. Failing to assess the differential impact of pedagogy on causal learning during early childhood limits educators to theories that only take child-directed learning into account. 
+  While computational models of children’s causal learning exist (e.g., Kosoy et al., 2022; Gopnik et al. 2004; Sobel, 2014; Oudeyer & Smith, 2014; Twomey & Westermann, 2016; Bonawitz et al., 2022; Colantonio et al., in press), there is no pre-existing model which factors in pedagogy-type as a predictor of learning behaviors. By utilizing machine learning to train models both with-and-without the presence of diverse pedagogy categories, we can greatly expand the predictive power of causal learning models, which are currently limited to child-directed learning predictors. 
+  Our long-term goal is to establish predictive models of preschoolers’ causal learning outcomes within naturalistic settings based upon teachers’ pedagogical styles. The overall objective is to elucidate how interactions between pedagogy type, attentional patterns, and exploratory behavior inform competing computational models of causal learning outcomes and to train a best-performing model via machine learning. Our central hypotheses is as follows: causal learning models will perform best when taking granular pedagogy types into account. We aim to create and test competing computational models related to the interaction between pedagogy type and causal learning. We predict that prior computational models of causal learning that contain fewer pedagogy categories (or do not take pedagogy into account) will perform worse than pedagogy-diverse models of causal learning. Upon completion, our expected outcomes are to have established the interaction between adult instruction style and children’s visual attention processes and exploratory behaviors within physical causal learning domains. These results will a) add valuable evidence to clarify developmentalists’ theoretical and computational accounts of causal learning, and b) pave a way forward to support educators in developing effective curriculum for young students during a time of immense educational resource shortages.
+
 # Methods
 
+### outline: describe models, coding system, variables, etc.
+
+### Coding system: based on rank order created for gen survey
 
 ## Participants
 

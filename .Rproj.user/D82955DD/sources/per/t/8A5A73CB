@@ -3,7 +3,7 @@
     "path": "~/Oregon/Courses/datascience spec/edld_640/EDLD-640-Capstone/scripts/capstone640.Rmd",
     "project_path": "scripts/capstone640.Rmd",
     "type": "r_markdown",
-    "hash": "3114014769",
+    "hash": "1235675004",
     "contents": "",
     "dirty": false,
     "created": 1674679968488.0,
@@ -12,16 +12,16 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "347,49",
-        "scrollLine": "333",
+        "cursorPosition": "395,0",
+        "scrollLine": "380",
         "chunk_output_type": "console"
     },
     "folds": "",
-    "lastKnownWriteTime": 1675291937,
+    "lastKnownWriteTime": 1676580919,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1675291937978,
+    "last_content_update": 1676580919435,
     "read_only": false,
     "read_only_alternatives": []
 }
