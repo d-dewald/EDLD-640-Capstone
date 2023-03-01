@@ -1,0 +1,28 @@
+{
+    "id": "98F04D60",
+    "path": null,
+    "project_path": null,
+    "type": "object_explorer",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1677708023756.0,
+    "source_on_save": false,
+    "relative_order": 17,
+    "properties": {
+        "id": "676d2886b70e4ea78fd4c17f261b6bad",
+        "name": "blueprint_textdummy",
+        "title": "blueprint_textdummy",
+        "language": "R",
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 7215364875350968876,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1677708023756,
+    "read_only": false,
+    "read_only_alternatives": []
+}

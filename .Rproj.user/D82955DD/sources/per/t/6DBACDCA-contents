@@ -1,0 +1,20 @@
+---
+title: "Leave empty"
+author: "Leave empty"
+date: "Leave empty"
+output: ioslides_presentation
+---
+---
+- Progress this week
+    - fixed sentiment analysis
+    - coded ped predictors and ran k-nearest neighbors for total play time outcome
+-  Revisions to product: to add for next week
+    - integrate/deploy manubot github repo for interactive manuscript
+- Plan for coming weeks
+    - finish writing results and discussion
+    - still deciding on figures & code to include in manuscript
+    - fix bibliography & other logistics w/ papaja
+    
+    
+    
+This week I made progress in fixing the sentiment analysis and running a k nearest neighbors model w/ rank ordered outcomes coded to my pedagogy text data--I have run into some issues with each of these things however, so I plan to stay after and ask Cengiz about some errors that I'm getting. In terms of revisions, I thought the manuscript frame that Rebecca shared last week was really cool and I'd like to integrate that into my project if possible, as a part of the final product. Over the next few weeks, I plan to finish writing the manuscript, and make decisions on displaying the figures and analyses within the paper.

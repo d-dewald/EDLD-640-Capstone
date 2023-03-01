@@ -279,6 +279,25 @@ sentiment = textdata %>% #this allows us to retain the row number/the tweet
   anti_join(stop_words)%>% #removes common words (stop words)
   left_join(get_sentiments("bing"))
 
+library(writexl)
+
+
+write_xlsx(sentiment, "sentiment.xlsx")
+sentimentdata <- import(here("data", "sentiment.xlsx"))
+
+sentiment_by_condition <- sentimentdata %>%
+  group_by(condition) %>%
+  count(sentiment)
+
+word_countID = tokens%>%
+  group_by(id) %>%
+  summarise(count = n())
+
+sentimentdata <- left_join(sentimentdata, word_countID, by = "id")
+# the enhance condition has roughly equal positive and negative sentiment, whereas the constrain condition has a ratio of ~ 1:3 positive to negative words (note: neutral words have been removed--sentiment was calculated according to "bing"--line 280 above)
+
+# predictors for sentiment (and later, for child outcomes): word count, function (squeak or light), condition (enhance or constrain), source -->possible to add later: age, gender, ethnicity, adherence
+
 # word cloud
 positive_sentiment = sentiment%>% filter(!is.na(sentiment),
                                          sentiment == 'positive') 
@@ -348,6 +367,8 @@ sentbars = words %>%
          sentiment_group = ifelse(sentiment > 0, "pos", "neg"))%>%
   ungroup()
 
+# bing - just looks at words being used compared to a pre-created dictionary; is there one that understands sentences. Find pre-defined model w/ positive or negative sentiment (positive, negative, neutral).
+
 # the plot itself
 ggplot(data = sentbars) +
   geom_bar(aes(x = index, y = sentiment, fill = sentiment_group), stat = "identity")+
@@ -395,6 +416,159 @@ ggplot(data = cloud)+
 
 
 ```
+
+
+
+
+
+
+
+
+## Part 1: Predicting a Categorical Outcome (sentiment: pos or neg) using Regularized Logistic Regression
+
+```{r part1_prep, warning = FALSE}
+
+# Recipe for the sentiment dataset
+
+outcome <- c('sentiment')
+
+ID <- c('id')
+
+categorical <- c('condition', 'source', 'function', 'count')
+
+# Problem: currently getting an error when I try to train the model.The error is coming from step_medianimpute(). step_medianimpute() requires all the variables to be numeric but it is being passed factor variables with all_predictors().One way to fix this problem is by rearranging your recipe to create dummy variables before you impute.need to dummy code
+
+blueprint <- recipe(x  = sentimentdata,
+                    vars  = c(categorical, outcome, ID),
+                    roles = c(rep('predictor',4), 'outcome', 'ID')) %>%
+  step_zv(all_of(categorical)) 
+ 
+blueprint
+
+```
+
+### Task 1.1: split dataset into training and testing
+
+```{r 1.1, warning = FALSE}
+# Let the training data have the 80% of cases and the test data have the 20% of the cases.
+
+set.seed(11102021)  # for reproducibility
+  
+sen      <- sample(1:nrow(sentimentdata), round(nrow(sentimentdata) * 0.8))
+sen_train  <- sentimentdata[sen, ]
+sen_test  <- sentimentdata[-sen, ]
+
+```
+
+
+### Task 1.2: 10-fold cross-validation without regularization
+
+```{r 1.2, warning = FALSE}
+
+set.seed(11152021) # for reproducibility
+
+sen_tr = sen_train[sample(nrow(sen_train)),]
+
+  # Creating 10 folds with equal size
+
+folds = cut(seq(1,nrow(sen_tr)),breaks=10,labels=FALSE)
+  
+  # Creating the list for each fold 
+sen.indices <- vector('list',10)
+
+      for(i in 1:10){
+        sen.indices[[i]] <- which(folds!=i)
+      }
+    
+
+ cv <- trainControl(method    = "cv",
+                   index           = sen.indices,
+                   classProbs      = TRUE,
+                   summaryFunction = mnLogLoss)
+    
+      
+# Train the model
+  
+caret_mod <- caret::train(blueprint, 
+                          data      = sen_tr, 
+                          method    = "glm",
+                          family    = 'binomial',
+                          metric    = 'logLoss',
+                          trControl = cv)
+
+caret_mod
+
+# Evaluate the model on the test data
+
+# Predict the probabilities for the observations in the test dataset
+
+predicted_test <- predict(caret_mod, sen_test, type='prob')
+
+head(predicted_test)
+
+
+# Evaluate the model on the test dataset
+predicted_te <- predict(caret_mod, sen_test)
+
+predicted_te <- as.numeric(predicted_te)
+sen_test_numeric <- sen_test$sentiment_numeric
+
+
+predicted_eval <- data.frame(predicted_te, sen_test_numeric)
+predicted_eval <- predicted_eval[complete.cases(predicted_eval), ]
+
+
+rsq_te <- cor(predicted_eval$predicted_te,predicted_eval$sen_test_numeric)^2
+rsq_te
+
+mae_te <- mean(abs(predicted)eval$sen_test_numeric - predicted_te))
+mae_te
+
+rmse_te <- sqrt(mean((oregon_test$score - predicted_te)^2))
+rmse_te
+
+```
+#### Will discuss this more in 1.5, but the model without regularization doesn't seem to be the best for predicting outcomes on the test dataset.
+
+### Task 1.3: 10-fold cross-validation with ridge penalty
+```{r 1.3 ridge, warning = FALSE}
+ caret::getModelInfo()$glmnet$parameters
+
+# currently getting this error when running ridge and lasso penalty: Error in { : 
+#  task 1 failed - "error in evaluating the argument 'x' in selecting a method for function 'as.matrix': invalid class 'NA' to dup_mMatrix_as_dgeMatrix"
+# In addition: There were 20 warnings (use warnings() to see them)
+
+
+grid_ridge <- data.frame(alpha = 0, lambda = seq(0.01,2,.01)) 
+# grid
+  
+  ridge <- caret::train(blueprint, 
+                        data      = sen_train, 
+                        method    = "glmnet",
+                        family = 'binomial', 
+                        metric = 'logLoss',
+                        trControl = cv,
+                        tuneGrid  = grid_ridge)
+  
+# ridge$results
+
+
+# ridge$bestTune
+  
+# plot(ridge)
+
+
+```
+
+The optimal lambda value for a lasso penalty was _____
+
+
+According to the second lasso model, the optimal lambda value for lasso penalty is _______
+
+
+### Find and report the most important 10 predictors of sentiment and their coefficients. 
+
+
 
 
 ## Data analysis: Logistic regression (in progress)
@@ -445,7 +619,7 @@ set.seed(11152021) # for reproducibility
 
 omsi_tr = ped_train[sample(nrow(ped_train)),]
 
-  # Creating 10 folds with equal size
+  # Creating 10 folds with equal size (creating an empty list not currently working)
 
 folds_omsi = cut(seq(1,nrow(omsi_tr)),breaks=10,labels=FALSE)
   
@@ -467,13 +641,13 @@ set.seed(125)
       
 # Train the model
   
-# ped_mod <- caret::train(blueprint, 
-#                          data      = omsi_tr, 
-#                          method    = "glm",
-#                          family    = 'binomial',
-#                          metric    = 'logLoss',
-#                          trControl = cv)
-
+ ped_mod <- caret::train(blueprint, 
+                          data      = omsi_tr, 
+                          method    = "glm",
+                          family    = 'binomial',
+                          metric    = 'logLoss',
+                          trControl = cv)
+rlang::last_error()
 # ped_mod
 
 # Evaluate the model on the test data
@@ -486,6 +660,88 @@ set.seed(125)
 
 ```
 
+## K-nearest neighbors algorithm to predict rank ordered exploration-promotion
+
+```{r}
+# import data
+textdummy <- import(here("data", "text_data_dummy.xlsx"))
+
+# train and test split
+
+set.seed(10152022) # for reproducibility
+
+loc <- sample(1:nrow(textdummy), round(nrow(textdummy) * 0.9))
+rank_tr <- textdummy[loc, ]
+rank_te <- textdummy[-loc, ]
+
+
+# create row indices for 10-folds
+
+  #randomly shuffle training data
+rank_tr = rank_tr[sample(nrow(rank_tr)),]
+
+
+    # Create 10 folds with equal size
+
+      folds = cut(seq(1,nrow(rank_tr)),breaks=10,labels=FALSE)
+  
+    # Create the list for each fold 
+      
+      my.indices <- vector('list',10)
+      for(i in 1:10){
+        my.indices[[i]] <- which(folds!=i)
+      }
+
+# Cross-validation settings
+      
+  cv <- trainControl(method = "cv",
+                     index  = my.indices)
+  
+require(caret)
+require(kknn)
+
+getModelInfo()$kknn$parameters
+
+
+# Hyperparameter Tuning Grid
+  
+  grid <- expand.grid(kmax    = 3:25,
+                     distance = c(1,2,3),
+                     kernel   = c('epanechnikov','rectangular'))
+  grid
+  
+  
+require(doParallel)
+
+ncores <- 8    
+
+cl <- makePSOCKcluster(ncores)
+
+registerDoParallel(cl)
+
+
+# Train the model
+
+
+outcome <- c('rank')
+
+ID <- c('id')
+
+categorical <- c('condition', 'source', 'function')
+
+
+blueprint_textdummy <- recipe(x  = textdummy,
+                    vars  = c(categorical, outcome, ID),
+                    roles = c(rep('predictor',3), 'outcome', 'ID')) 
+
+
+  caret_knn <- caret::train(blueprint_textdummy, 
+                                        data      = rank_tr,
+                                        method    = "kknn",
+                                        trControl = cv,
+                                        tuneGrid  = grid)
+
+```
 
 
 # Results (in progress)
