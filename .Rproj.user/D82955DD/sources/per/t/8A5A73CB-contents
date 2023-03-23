@@ -15,12 +15,12 @@ affiliation:
 
 abstract: |
   
-  How is young children's exploration impacted by adult pedagogy? Can we create Machine Learning models to predict how a child will explore the causal features of an object based upon the pedagogy they are exposed to? Our goal is to establish predictive models of preschoolers' causal learning outcomes within educational settings based upon teachers' pedagogical styles. Using pre-existing samples of pedagogy and child outcomes, we created three machine learning models to capture 1) the extent to which adults produce pedagogy that is likely to have the intended effect on preschoolers' play behavior when prompted accordingly, and 2) the extent to which pedagogy that has different intent based upon the prompt differs in sentiment. We found that......
+  How is young children's exploration impacted by adult pedagogy? Can we create Machine Learning models to predict how a child will explore the causal features of an object based upon the pedagogy they are exposed to? Our goal is to establish predictive models of preschoolers' causal learning outcomes within educational settings based upon teachers' pedagogical styles. Using pre-existing samples of pedagogy and child outcomes, we created three machine learning models to capture 1) the extent to which adults produce pedagogy that is likely to have the intended effect on preschoolers' play behavior when prompted accordingly, and 2) the extent to which pedagogy that has different intent based upon the prompt differs in sentiment. We found that sentiment of pedagogical statements did not seem to be related to whether participants were in a condition to enhance or to constrain exploration. We also found that the number of unique actions a child performed had to do with their likelihood of discovering the squeaker target function (introduced in pedagogy).
   
   
   <!-- https://tinyurl.com/ybremelq -->
 keywords          : "causal learning models, pedagogy, text analysis"
-wordcount         : "1933"
+wordcount         : "2756"
 bibliography      : ["r-references.bib"]
 floatsintext      : no
 figurelist        : no
@@ -266,7 +266,7 @@ a virtual python environment without success, we decided to utilize sentiment
 analysis program from "bing" to perform analyses for Model 1. We also utilized three
 other programs ("afinn", "loughran", and "nrc"), and a summary of their positive and
 negative assessments by condition is included in Table 1 at the end of this 
-document.
+document.Results indicate that pedagogy did not differ significantly in sentiment based upon the condition participants were in.
 
 ```{r, warning=FALSE}
 # sentiment analysis with nrc, afinn, loughran, and bing
@@ -410,14 +410,20 @@ rmse_te <- sqrt(mean((predicted_eval$sen_test_numeric - predicted_eval$predicted
 ```
 
 # Results Model 1 
-The first model is a regularized logistic regression predicting sentiment type (positive or negative) from a participant's condition (enhance or constrain), source (qualtrics survey or pre-existing study pedagogy) and function ('squeaker' or 'light). Results indicate that pedagogy did not differ significantly in sentiment based upon the condition participants were in... Model performance....
-
-logLoss: 0.626
-rsq_te: 0.026
-mae_te: 0.614
-rmse_te: 0.784
+The first model is a regularized logistic regression predicting sentiment type 
+(positive or negative) from a participant's condition (enhance or constrain), source
+(qualtrics survey or pre-existing study pedagogy) and function ('squeaker' or 
+'light). Model 1 results indicate that the model may not be capturing the proper 
+predictors for sentiment (or our previous sentiment analysis--utilizing bing, might 
+not accurately be representing the sentiment in our sample). It is also possible 
+that there is no relation between sentiment and condition, source, or function. The 
+R-squared value indicates the the model is predicting only a fraction of the 
+proportion of variance (0.026). Similarly, root mean squared error (0.78) and mean 
+absolute error (0.61) also indicate that the model's predictions are farther away 
+from the actual values.
 
 ### Model 2: K-nearest neighbors to predict rank ordered exploration-promotion from pedagogy text sample
+
 ```{r, warning=FALSE, echo=TRUE}
 # import data
 # textdummy <- import(here("data", "text_data_dummy.xlsx"))
@@ -518,15 +524,21 @@ sqrt(mean((rank_te$rank - predicted_te)*2))
 mean(abs(rank_te$rank -predicted_te))
   
 ```
+
 # Results Model 2
- r-square: 0.613
- rmse: 0.85
- mae: 0.941
+In Model 2, we trained a k nearest neighbor model with a rank outcome (7-point 
+likert scale representing the likelihood a given pedagogical text will illicit a 
+certain behavior). We utilized the same predictors as in Model 1 (condition, source,
+function). The resultant R-square value of 0.61 indicates that 61% of the variance 
+in the outcome is explained by our model. However, we also obtained a root mean 
+squared error of 0.85 and a mean absolute error value of 0.94, indicating that our 
+model had a fair degree of error in its predictions. The results suggest that our 
+model is an okay fit, but we should likely investigate other predictors for best 
+fit. 
  
-### Model 3: Logistic regression predicting whether a particular object function was discovered
+### Model 3: Logistic regression predicting whether the target function was discovered
 
-```{r, include = TRUE, warning= FALSE, echo=TRUE}
-
+```{r, warning= FALSE, echo=TRUE}
 # omsi <- import(here("data", "omsidata.xlsx"))
 omsi <- import(here("data", "omsi.xlsx"))
 
@@ -633,15 +645,36 @@ ind   <- order(abs(coefs),decreasing=T)
 ```
 
 # Results Model 3
-rsq: 0.00051
-mae: 0.674
-rmse: 0.833
-
-The most important varialbes impacting whether or not the squeaker was discovered were (in order): number of unique actions, total play time, squeaker play time, participant, age in months, condition, and gender.
+In Model 3, we were predicting whether or not a given child discovered the squeaker
+'target' function (binary outcome) based upon eight predictors: condition, gender, 
+total play time, unique actions, time spent playing with the squeaker, number of 
+target functions discovered, number of total functions discovered, and age in months
+(range: 34months-75months). Our results indicated that the model did not capture a 
+great degree of variance (R-squared = 0.0005), and had a high degree of error (RMSE=
+0.83; MAE = 0.67). However, the predictor 'unique actions' did seem to be closely 
+related to the extent to which the squeaker was discovered. Accordingly, the most 
+important varialbes impacting whether or not the squeaker was discovered were (in 
+order): number of unique actions, total play time, squeaker play time, participant, 
+age in months, condition, and gender.
 
 
 # Discussion
-
+In terms of descriptives and Model 1, the condition participants were in did not 
+seem to have an impact on the positive or negative sentiment of their text pedagogy 
+statements (per Model 1, neither did the function or source type). For the 
+regularized logistic regression with a categorical outcome in Model 2, the model 
+didn't seem to capture the predictors behind the rank order results--although in 
+future, we plan to assess condition variables and child data predictors and drop the
+source and function as predictors, since they weren't strongly related to this 
+outcome. In Model 3, we assessed the degree to which the model capture a binary 
+child outcome (discovering the squeaker function on the basis of eight predictors). 
+The strongest related predictor was the number of unique actions a child performed. 
+This is not altogether unsurprising, since the more actions a child performed on the
+toy, the higher their likelihood of discovering the squeaker. In the future, we hope
+to delve more deeply into the relations between our naturalistic pedagogy text data 
+and the text data that is used as an independent pedagogy variable in empirical 
+studies. That is, do adults accurately create pedagogy types that increase the 
+likelihood that a child will perform a certain behavior?
 
 \newpage
 
