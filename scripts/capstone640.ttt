@@ -1,0 +1,22 @@
+\begin{table*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
+\caption{\label{tab:unnamed-chunk-3}Sentiment by analysis tool}
+\centering
+\begin{threeparttable}
+\begin{tabular}[t]{>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}}
+\hline
+Pos bing & Neg bing & Pos nrc & Neg nrc & Pos loughran & Neg loughran & Pos afinn & Neg afinn & Total Positive & Total Negative\\
+\hline
+64 & 66 & 277 & 73 & 18 & 73 & 61 & 10 & 420 & 222\\
+\hline
+41 & 116 & 274 & 94 & 40 & 28 & 54 & 26 & 409 & 264\\
+\hline
+\end{tabular}
+\begin{tablenotes}[para]
+\item \textit{Note.}
+\item Positive (Pos) and Negative (Neg) sentiment analysis by individual words using 4 analysis tools: bing, nrc, loughran, and afinn. Results demonstrate that Total Positive \& Negative sentiment was roughly equal by condition (enhance or constrain). However, positive sentiment was slightly higher for the enhance condition and negative sentiment was slight higher for the constrain condition, which is the expected result.
+\end{tablenotes}
+\end{threeparttable}
+\end{table*}

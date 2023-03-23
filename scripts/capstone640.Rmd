@@ -64,12 +64,13 @@ library(cutpointr)
 library(kableExtra)
 library(pastecs)
 
-
-
 ```
 
 # Introduction
-  Developmentalists and educators have long debated the benefits of child-directed (Montessori style) exploration contra adult-directed (pedagogical) instruction on learning outcomes. The truth is that both provide valuable learning opportunities, but questions of how, in what cases, and for which individuals remain fuzzy. While young children (age 3-6) often re-structure their hypotheses about the world based upon self-directed exploration á la Montessori, there are many subjects children cannot master without adult-directed pedagogical guidance (e.g., novel object labels, the alphabet, color and shape labels, historical events, the existence of entities such as germs, etc.). Such subjects are often culturally and linguistically bound, but even causal learning related to the physical properties of objects and entities can benefit from adult-directed pedagogy. Clarifying the extent to which pedagogy supports—and in some cases diminishes—effective causal learning is essential for a) informing teaching strategies in a time when many preparatory schools in the U.S. suffer from a lack of funding and teacher support [@SRCD; @NIERR], and b) elevating early education outcomes following relative dips in school preparedness over the past three years (Jalongo, 2021; [@gonzalez2022school]).
+  
+  Developmentalists and educators have long debated the benefits of child-directed (Montessori style) exploration contra adult-directed (pedagogical) instruction on learning outcomes.In this project, I investigate 
+  
+  The truth is that both provide valuable learning opportunities, but questions of how, in what cases, and for which individuals remain fuzzy. While young children (age 3-6) often re-structure their hypotheses about the world based upon self-directed exploration á la Montessori, there are many subjects children cannot master without adult-directed pedagogical guidance (e.g., novel object labels, the alphabet, color and shape labels, historical events, the existence of entities such as germs, etc.). Such subjects are often culturally and linguistically bound, but even causal learning related to the physical properties of objects and entities can benefit from adult-directed pedagogy. Clarifying the extent to which pedagogy supports—and in some cases diminishes—effective causal learning is essential for a) informing teaching strategies in a time when many preparatory schools in the U.S. suffer from a lack of funding and teacher support [@SRCD; @NIERR], and b) elevating early education outcomes following relative dips in school preparedness over the past three years (Jalongo, 2021; [@gonzalez2022school]).
   In early childhood (age 3-6), children learn about causality through both self-directed and adult-directed methods. In recent years, adult-directed early education programs have undergone substantial changes in the U.S., yet the vast majority of causal learning models remain focused on child-directed learning outcomes. Those who have sought to address the impact of adult-directed pedagogy on causal learning describe a pedagogical trade-off model. This model proposes that adult instruction increases the proportion of time children spend exploring an object’s pedagogy-relevant properties but limits their investigation of other properties. Conversely, child-directed exploration is understood to produce broader discovery of the complete set of an object’s causal properties but diminish the time spent investigating any particular property. While such behavioral outcomes are established, little is known about the cognitive mechanisms that drive this pedagogical trade-off, how to computationally map the trade-off, and the extent to which computational models capture individual differences in learning outcomes. Failing to assess the differential impact of pedagogy on causal learning during early childhood limits educators to theories that only take child-directed learning into account. 
   While computational models of children’s causal learning exist (e.g., Kosoy et al., 2022; Gopnik et al. 2004; Sobel, 2014; Oudeyer & Smith, 2014; Twomey & Westermann, 2016; Bonawitz et al., 2022; Colantonio et al., in press), there is no pre-existing model which factors in pedagogy-type as a predictor of learning behaviors. By utilizing machine learning to train models both with-and-without the presence of diverse pedagogy categories, we can greatly expand the predictive power of causal learning models, which are currently limited to child-directed learning predictors. 
   Our long-term goal is to establish predictive models of preschoolers’ causal learning outcomes within naturalistic settings based upon teachers’ pedagogical styles. The overall objective is to elucidate how interactions between pedagogy type, attentional patterns, and exploratory behavior inform competing computational models of causal learning outcomes and to train a best-performing model via machine learning. Our central hypotheses is as follows: causal learning models will perform best when taking granular pedagogy types into account. We aim to create and test competing computational models related to the interaction between pedagogy type and causal learning. We predict that prior computational models of causal learning that contain fewer pedagogy categories (or do not take pedagogy into account) will perform worse than pedagogy-diverse models of causal learning. Upon completion, our expected outcomes are to have established the interaction between adult instruction style and children’s visual attention processes and exploratory behaviors within physical causal learning domains. These results will a) add valuable evidence to clarify developmentalists’ theoretical and computational accounts of causal learning, and b) pave a way forward to support educators in developing effective curriculum for young students during a time of immense educational resource shortages.
@@ -90,7 +91,6 @@ library(pastecs)
 
 mydata <- import(here("data", "pedagogy_data.xlsx"))
 textdata <- import(here("data", "text_data.xlsx"))
-# devdata <-
 
 # fixing demographic variables
 
@@ -148,58 +148,11 @@ tidy_words %>%
     y = "Word",
     title = "Top 15 most frequently occurring words across all pedagogy types",
   )
-
 ```
 
 
-```{r analysis-preferences, include = FALSE, warning = FALSE}
-# Seed for random number generation
-set.seed(42)
-knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
-```
+```{r word cloud, warning=FALSE}
 
-
-```{r nlp start, warning = FALSE}
-
-# tokenizing
-unigrams = textdata %>% unnest_tokens(word, text, token = "ngrams", n = 1)
-bigrams = textdata %>% unnest_tokens(bigram, text, token = "ngrams", n = 2)
-
-# no stop words
-unigrams_cleaned = unigrams %>%
-  filter(!word %in% stop_words$word)
-
-# stemming
-library(SnowballC)
-
-unigrams_cleaned = unigrams %>%
-  filter(!word %in% stop_words$word)%>%
-  mutate(word = wordStem(word))
-
-# lemmatization
-library(textstem)
-
-unigrams_cleaned = unigrams %>%
-  filter(!word %in% stop_words$word)%>%
-  mutate(word = lemmatize_words(word))
-
-# cleaning n-grams
-
-library(tm)
-
-ngramsclean <- textdata %>%
-  unnest_tokens(word, text, token = "ngrams", n = 1)%>%
-  filter(!word %in% stop_words$word)%>% # removing stop words
-  mutate(word = lemmatize_words(word))%>% 
-  group_by(id)%>%
-  summarise(text = paste(word, collapse = " "))%>%
-  unnest_tokens(word, text, token = "ngrams", n = 3)
-
-```
-
-### Wordcloud for overall sentiment
-
-```{r, warning = FALSE}
 # visualing: word cloud
 library(wordcloud)
 
@@ -225,194 +178,139 @@ cloud <- tokens %>%
 
 wordcloud(tokens$word, max.words = 75, colors=brewer.pal(6, "Dark2"))
 
-# word embeddings
-library(text2vec)
 
-# text8_file = "~/text8"
+```
 
-# unzip ("text8.zip", files = "text8", exdir = "~/")
-
-# wiki = readLines(text8_file, n = 1, warn = FALSE)
-
-# Create iterator over tokens
-tokens <- space_tokenizer(unigrams_cleaned$word) 
-
-# Create vocabulary. Terms will be unigrams (simple words).
-it = itoken(tokens, progressbar = FALSE)
-vocab <- create_vocabulary(it)
-
-vocab <- prune_vocabulary(vocab, term_count_min = 5L)
-vectorizer <- vocab_vectorizer(vocab)
-
-tcm <- create_tcm(it, vectorizer, skip_grams_window = 5L)
+##discussion of graph by condition
 
 
-glove = GlobalVectors$new(rank = 50, x_max = 10)
-# shakes_wv_main = glove$fit_transform(tcm, n_iter = 10, convergence_tol = 0.001)
+```{r, warning=FALSE}
+tidy_words %>% 
+  group_by(condition) %>%
+  anti_join(stop_words) %>% 
+  count(word, sort = TRUE) %>% 
+  mutate(word = reorder(word, n)) %>% # make y-axis ordered by n
+  slice(1:15) %>% # select only the first 15 rows
+  ggplot(aes(n, word, fill = condition)) +
+  geom_col(alpha = .7) +
+  facet_wrap(~condition) +
+  scale_x_continuous(expand = c(0,0)) +
+  theme_minimal() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.major.x = element_line(color = "gray80")
+  ) +
+  labs(
+    x = "Word Frequency",
+    y = "Word",
+    title = "Top 15 most frequently occurring words by condition",
+  )
+```
 
-# wv_context = glove$components
-# word_vectors = shakes_wv_main  + t(wv_context)
 
-# berlin = word_vectors["paris", , drop = FALSE] -
-#  word_vectors["france", , drop = FALSE] +
-#  word_vectors["germany", , drop = FALSE]
-
-# berlin_cos_sim = sim2(x = word_vectors, y = berlin, method = "cosine", norm = "l2")
-# head(sort(berlin_cos_sim[,1], decreasing = TRUE), 5)
+```{r analysis-preferences, include = FALSE, warning = FALSE}
+# Seed for random number generation
+set.seed(42)
+knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
+```
 
 
-# topic modelling--more work to do
-library(topicmodels)
+### sentiment analysis
+
+
+```{r, warning = FALSE}
+
+# devtools::install_github("rstudio/reticulate")
+
+ require(reticulate)
+
+Sys.setenv(RETICULATE_PYTHON = "C:/Users/ddewa/AppData/Local/r-miniconda/envs/capstone/python.exe")
+
+conda_install(envname = 'capstone', 
+              packages = 'torch', 
+              pip = TRUE, 
+              force = TRUE)
+
+conda_install(envname = 'capstone',
+              packages = 'transformers',
+              pip=TRUE, 
+              force=TRUE)
+
+conda_install(envname = 'capstone',
+              packages = 'protobuf',
+              pip=TRUE, 
+              force=TRUE)
+
+
+reticulate::use_condaenv("capstone")
+
+transformers <- reticulate::import('transformers')
+
+model_path <- "cardiffnlp/twitter-xlm-roberta-base-sentiment"
+
+sentiment_task <- transformers$pipeline("sentiment-analysis", 
+                                         model=model_path, 
+                                         tokenizer=model_path)
+
 
 
 ```
 
-### wordcloud for positive sentiment
+
+
+### Sentiment by analysis tool
 
 ```{r, warning=FALSE}
 # sentiment analysis
 library(RColorBrewer)
 
 
-sentiment = textdata %>% #this allows us to retain the row number/the tweet
-  unnest_tokens(word, text)%>% # this unnests the tweets into words
-  anti_join(stop_words)%>% #removes common words (stop words)
-  left_join(get_sentiments("bing"))
+# sentiment1 = textdata %>% #this allows us to retain the row number/the tweet
+#  unnest_tokens(word, text)%>% # this unnests the tweets into words
+#  anti_join(stop_words)%>% #removes common words (stop words)
+#  left_join(get_sentiments("bing"))
 
-library(writexl)
+#sentiment2 = textdata %>% #this allows us to retain the row number/the tweet
+#  unnest_tokens(word, text)%>% # this unnests the tweets into words
+#  anti_join(stop_words)%>% #removes common words (stop words)
+#  left_join(get_sentiments("nrc"))
+
+#sentiment3 = textdata %>% #this allows us to retain the row number/the tweet
+#  unnest_tokens(word, text)%>% # this unnests the tweets into words
+#  anti_join(stop_words)%>% #removes common words (stop words)
+#  left_join(get_sentiments("loughran"))
+
+#sentiment4 = textdata %>% #this allows us to retain the row number/the tweet
+#  unnest_tokens(word, text)%>% # this unnests the tweets into words
+#  anti_join(stop_words)%>% #removes common words (stop words)
+#  left_join(get_sentiments("afinn"))
 
 
-write_xlsx(sentiment, "sentiment.xlsx")
-sentimentdata <- import(here("data", "sentiment.xlsx"))
+sentimentdata <- import(here("data", "sentiment_an.xlsx"))
+sentiment <- import(here("data", "sentiment.xlsx"))
 
 sentiment_by_condition <- sentimentdata %>%
+  group_by(condition, analysis) %>%
+  count(sentiment)
+
+sentiment <- sentiment %>%
   group_by(condition) %>%
   count(sentiment)
 
-word_countID = tokens%>%
-  group_by(id) %>%
-  summarise(count = n())
+# table of sentiment for four groups ("bing", "nrc", "afinn", "loughran")
+sentimenttable <- import(here("data", "sentiment_table.xlsx"))
+table <- sentimenttable[1:2, 2:11]
 
-sentimentdata <- left_join(sentimentdata, word_countID, by = "id")
-# the enhance condition has roughly equal positive and negative sentiment, whereas the constrain condition has a ratio of ~ 1:3 positive to negative words (note: neutral words have been removed--sentiment was calculated according to "bing"--line 280 above)
-
-# predictors for sentiment (and later, for child outcomes): word count, function (squeak or light), condition (enhance or constrain), source -->possible to add later: age, gender, ethnicity, adherence
-
-# word cloud
-positive_sentiment = sentiment%>% filter(!is.na(sentiment),
-                                         sentiment == 'positive') 
-
-wordcloud(positive_sentiment$word, random.order = FALSE, colors=brewer.pal(6, "Dark2"))
-
-```
-
-### Wordcloud for negative sentiment
-
-```{r, warning = FALSE}
-
-negative_sentiment = sentiment%>% filter(!is.na(sentiment),
-                                         sentiment == 'negative') 
-
-wordcloud(negative_sentiment$word, random.order = FALSE, colors=brewer.pal(6, "Dark2"))
-```
-
-
-### Sentiment Radar Chart
-
-```{r, warning=FALSE}
-#### sentiment radar chart
-
-library(fmsb)
-library(tidyr)
-library(textdata)
-
-nrc_sentiment = textdata %>% #this allows us to retain the row number
-  unnest_tokens(word, text)%>% # this unnests the tweets into words
-  anti_join(stop_words)%>% #removes common words (stop words)
-  left_join(get_sentiments("nrc"))%>%
-  filter(!is.na(sentiment))
-
-nrc_sentiment = nrc_sentiment%>%
-  group_by(sentiment)%>%
-  summarise(count = n())%>%
-  spread(sentiment, count)
-
-# create rows with the min and max to be plotted
-nrc_sentiment <- rbind(rep(400,10) , rep(0,10), nrc_sentiment)
-
-radarchart(nrc_sentiment, axistype=1 , 
-           pcol=rgb(0.2,0.5,0.5,0.9) , pfcol=rgb(0.2,0.5,0.5,0.5) , plwd=4 , 
-           cglcol="grey", cglty=1, axislabcol="grey", caxislabels=seq(0,20,5), cglwd=0.8,
-           vlcex=0.8 )
-
-#### sentiment over time
-
-library(gutenbergr)
-library(tidyr)
-library(ggplot2)
-
-
-words <- textdata %>%
-  mutate(linenumber = row_number())%>%
-  unnest_tokens(word, text)
-
-sentbars = words %>%
-  inner_join(get_sentiments("bing"))%>%
-  # %/% performs integer divison, rounding down to the nearest whole number
-  mutate(index = linenumber %/% 25)%>% 
-  group_by(index, sentiment)%>%
-  summarise(count = n())%>%
-  spread(sentiment, count, fill = 0) %>%
-  mutate(sentiment = positive - negative,
-         sentiment_group = ifelse(sentiment > 0, "pos", "neg"))%>%
-  ungroup()
-
-# bing - just looks at words being used compared to a pre-created dictionary; is there one that understands sentences. Find pre-defined model w/ positive or negative sentiment (positive, negative, neutral).
-
-# the plot itself
-ggplot(data = sentbars) +
-  geom_bar(aes(x = index, y = sentiment, fill = sentiment_group), stat = "identity")+
-  theme_classic()+
-  theme(
-    legend.position = "none",
-    axis.ticks.x = element_blank(),
-    axis.line.x = element_blank(),
-    axis.text.x = element_blank()
-  )+
-  scale_fill_manual(values = c("darkred", "darkgreen"))+
-  labs(title = "The Sentiment of Pedagogy",
-       x = "Change over Time (Each Bar is 25 Lines of Text)",
-       y = "Sentiment Score")
-
-# parts of speech tagging
-## load udpipe
-library(udpipe)
+options(kableExtra.auto_format = FALSE)
 library(kableExtra)
 
-## download the "english" model
-udmodel <- udpipe_download_model(language = "english")
 
-##let's load the "english' model
-udmodel <- udpipe_load_model(file = udmodel$file_model)
-
-
-pos <- udpipe_annotate(udmodel, 
-                       x = unigrams_cleaned$word)
-
-pos <- as.data.frame(pos)
-
-## how can get a count of words by parts of speech using the following data.
-table(pos$upos)
-
-pos <- cbind_dependencies(pos, type = "parent")
-nominalsubject <- subset(pos, dep_rel %in% c("nsubj"))
-nominalsubject <- nominalsubject[, c("dep_rel", "token", "token_parent")]
-```
-
-```{r, warning = FALSE}
-ggplot(data = cloud)+
-  geom_bar(aes(x = word, y = count, fill = source), stat = "identity", position = "dodge")+
-  theme_classic()
+table %>% 
+  kbl(caption = "Sentiment by analysis tool") %>%
+  kable_classic(html_font = "Cambria") %>%
+  column_spec(column = 1:10, width = "0.57in") %>%
+  footnote(general_title = "Note.", footnote_as_chunk=TRUE, threeparttable=TRUE, general = "Positive (Pos) and Negative (Neg) sentiment analysis by individual words using 4 analysis tools: bing, nrc, loughran, and afinn. Results demonstrate that Total Positive & Negative sentiment was roughly equal by condition (enhance or constrain). However, positive sentiment was slightly higher for the enhance condition and negative sentiment was slight higher for the constrain condition, which is the expected result.") 
 
 
 ```
@@ -424,7 +322,7 @@ ggplot(data = cloud)+
 
 
 
-## Part 1: Predicting a Categorical Outcome (sentiment: pos or neg) using Regularized Logistic Regression
+## Part 1: Predicting a Categorical Outcome (sentiment: positive or negative) using Regularized Logistic Regression
 
 ```{r part1_prep, warning = FALSE}
 
@@ -434,16 +332,12 @@ outcome <- c('sentiment')
 
 ID <- c('id')
 
-categorical <- c('condition', 'source', 'function', 'count')
+categorical <- c('condition', 'source', 'function')
 
-# Problem: currently getting an error when I try to train the model.The error is coming from step_medianimpute(). step_medianimpute() requires all the variables to be numeric but it is being passed factor variables with all_predictors().One way to fix this problem is by rearranging your recipe to create dummy variables before you impute.need to dummy code
-
-blueprint <- recipe(x  = sentimentdata,
+ blueprint <- recipe(x  = sentiment,
                     vars  = c(categorical, outcome, ID),
-                    roles = c(rep('predictor',4), 'outcome', 'ID')) %>%
+                    roles = c(rep('predictor',3), 'outcome', 'ID')) %>%
   step_zv(all_of(categorical)) 
- 
-blueprint
 
 ```
 
@@ -454,9 +348,9 @@ blueprint
 
 set.seed(11102021)  # for reproducibility
   
-sen      <- sample(1:nrow(sentimentdata), round(nrow(sentimentdata) * 0.8))
-sen_train  <- sentimentdata[sen, ]
-sen_test  <- sentimentdata[-sen, ]
+sen      <- sample(1:nrow(sentiment), round(nrow(sentiment) * 0.8))
+sen_train  <- sentiment[sen, ]
+sen_test  <- sentiment[-sen, ]
 
 ```
 
@@ -488,23 +382,23 @@ sen.indices <- vector('list',10)
     
       
 # Train the model
-  
-caret_mod <- caret::train(blueprint, 
+ caret_mod <- caret::train(blueprint, 
                           data      = sen_tr, 
                           method    = "glm",
                           family    = 'binomial',
                           metric    = 'logLoss',
                           trControl = cv)
-
-caret_mod
-
-# Evaluate the model on the test data
+ 
+ caret_mod
+ 
+ # Evaluate the model on the test data
 
 # Predict the probabilities for the observations in the test dataset
-
-predicted_test <- predict(caret_mod, sen_test, type='prob')
+ 
+ predicted_test <- predict(caret_mod, sen_test, type='prob')
 
 head(predicted_test)
+
 
 
 # Evaluate the model on the test dataset
@@ -521,14 +415,14 @@ predicted_eval <- predicted_eval[complete.cases(predicted_eval), ]
 rsq_te <- cor(predicted_eval$predicted_te,predicted_eval$sen_test_numeric)^2
 rsq_te
 
-mae_te <- mean(abs(predicted)eval$sen_test_numeric - predicted_te))
-mae_te
+mae_te <- mean(abs(predicted_eval$sen_test_numeric - predicted_eval$predicted_te))
+ mae_te
 
-rmse_te <- sqrt(mean((oregon_test$score - predicted_te)^2))
+rmse_te <- sqrt(mean((predicted_eval$sen_test_numeric - predicted_eval$predicted_te)^2))
 rmse_te
-
 ```
-#### Will discuss this more in 1.5, but the model without regularization doesn't seem to be the best for predicting outcomes on the test dataset.
+
+  Model performance:
 
 ### Task 1.3: 10-fold cross-validation with ridge penalty
 ```{r 1.3 ridge, warning = FALSE}
@@ -542,13 +436,13 @@ rmse_te
 grid_ridge <- data.frame(alpha = 0, lambda = seq(0.01,2,.01)) 
 # grid
   
-  ridge <- caret::train(blueprint, 
-                        data      = sen_train, 
-                        method    = "glmnet",
-                        family = 'binomial', 
-                        metric = 'logLoss',
-                        trControl = cv,
-                        tuneGrid  = grid_ridge)
+#  ridge <- caret::train(blueprint, 
+#                        data      = sen_train, 
+#                        method    = "glmnet",
+#                        family = 'binomial', 
+#                        metric = 'logLoss',
+#                        trControl = cv,
+#                        tuneGrid  = grid_ridge)
   
 # ridge$results
 
@@ -556,9 +450,8 @@ grid_ridge <- data.frame(alpha = 0, lambda = seq(0.01,2,.01))
 # ridge$bestTune
   
 # plot(ridge)
-
-
 ```
+
 
 The optimal lambda value for a lasso penalty was _____
 
@@ -571,7 +464,7 @@ According to the second lasso model, the optimal lambda value for lasso penalty 
 
 
 
-## Data analysis: Logistic regression (in progress)
+## Data analysis: Logistic regression predicting whether a particular object function was discovered
 
 ```{r, include = TRUE, warning= FALSE, include=FALSE}
 
@@ -641,13 +534,13 @@ set.seed(125)
       
 # Train the model
   
- ped_mod <- caret::train(blueprint, 
-                          data      = omsi_tr, 
-                          method    = "glm",
-                          family    = 'binomial',
-                          metric    = 'logLoss',
-                          trControl = cv)
-rlang::last_error()
+# ped_mod <- caret::train(blueprint, 
+#                          data      = omsi_tr, 
+#                          method    = "glm",
+#                          family    = 'binomial',
+#                          metric    = 'logLoss',
+#                          trControl = cv)
+
 # ped_mod
 
 # Evaluate the model on the test data
@@ -658,11 +551,13 @@ rlang::last_error()
 
 # head(predicted_test)
 
+
+# sentiment analysis notes
+
 ```
 
 ## K-nearest neighbors algorithm to predict rank ordered exploration-promotion
 
-```{r}
 # import data
 textdummy <- import(here("data", "text_data_dummy.xlsx"))
 
@@ -741,7 +636,7 @@ blueprint_textdummy <- recipe(x  = textdummy,
                                         trControl = cv,
                                         tuneGrid  = grid)
 
-```
+
 
 
 # Results (in progress)
