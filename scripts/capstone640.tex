@@ -48,6 +48,46 @@
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
 \urlstyle{same} % disable monospaced font for URLs
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
 \usepackage{graphicx}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
@@ -139,7 +179,7 @@
   {}{\typeout{Failed to patch title.}}
 \makeatother
 \shorttitle{Natural Language Processing for Pedagogy}
-\keywords{causal learning models, pedagogy, text analysis\newline\indent Word count: 944}
+\keywords{causal learning models, pedagogy, text analysis\newline\indent Word count: 1219}
 \DeclareDelayedFloatFlavor{ThreePartTable}{table}
 \DeclareDelayedFloatFlavor{lltable}{table}
 \DeclareDelayedFloatFlavor*{longtable}{table}
@@ -168,11 +208,7 @@
 \affiliation{\vspace{0.5cm}\textsuperscript{1} University of Oregon}
 
 \abstract{
-(will change wording to past tense once project is completed, and will add in results and discussion summary)..
-
-How is young children's exploration impacted by adult pedagogy? Can we create Machine Learning models to predict how a child will explore the causal features of an object based upon the pedagogy they are exposed to? Our goal is to establish predictive models of preschoolers' causal learning outcomes within educational settings based upon teachers' pedagogical styles. Using pre-existing samples of pedagogy and child outcomes, we\ldots{}
-
-The rationale for this investigation is that determining the pedagogy-inclusive models predicting children's behavior in educational settings will allow us to predict cases where adult-directed instruction creates positive learning outcomes.
+How is young children's exploration impacted by adult pedagogy? Can we create Machine Learning models to predict how a child will explore the causal features of an object based upon the pedagogy they are exposed to? Our goal is to establish predictive models of preschoolers' causal learning outcomes within educational settings based upon teachers' pedagogical styles. Using pre-existing samples of pedagogy and child outcomes, we created three machine learning models to capture 1) the extent to which adults produce pedagogy that is likely to have the intended effect on preschoolers' play behavior when prompted accordingly, and 2) the extent to which pedagogy that has different intent based upon the prompt differs in sentiment. We found that\ldots\ldots{}
 }
 
 
@@ -183,39 +219,151 @@ The rationale for this investigation is that determining the pedagogy-inclusive 
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
 
-Developmentalists and educators have long debated the benefits of child-directed (Montessori style) exploration contra adult-directed (pedagogical) instruction on learning outcomes.In this project, I investigate
-
-The truth is that both provide valuable learning opportunities, but questions of how, in what cases, and for which individuals remain fuzzy. While young children (age 3-6) often re-structure their hypotheses about the world based upon self-directed exploration á la Montessori, there are many subjects children cannot master without adult-directed pedagogical guidance (e.g., novel object labels, the alphabet, color and shape labels, historical events, the existence of entities such as germs, etc.). Such subjects are often culturally and linguistically bound, but even causal learning related to the physical properties of objects and entities can benefit from adult-directed pedagogy. Clarifying the extent to which pedagogy supports---and in some cases diminishes---effective causal learning is essential for a) informing teaching strategies in a time when many preparatory schools in the U.S. suffer from a lack of funding and teacher support (\textbf{SRCD?}; \textbf{NIERR?}), and b) elevating early education outcomes following relative dips in school preparedness over the past three years (Jalongo, 2021; (\textbf{gonzalez2022school?})).
-In early childhood (age 3-6), children learn about causality through both self-directed and adult-directed methods. In recent years, adult-directed early education programs have undergone substantial changes in the U.S., yet the vast majority of causal learning models remain focused on child-directed learning outcomes. Those who have sought to address the impact of adult-directed pedagogy on causal learning describe a pedagogical trade-off model. This model proposes that adult instruction increases the proportion of time children spend exploring an object's pedagogy-relevant properties but limits their investigation of other properties. Conversely, child-directed exploration is understood to produce broader discovery of the complete set of an object's causal properties but diminish the time spent investigating any particular property. While such behavioral outcomes are established, little is known about the cognitive mechanisms that drive this pedagogical trade-off, how to computationally map the trade-off, and the extent to which computational models capture individual differences in learning outcomes. Failing to assess the differential impact of pedagogy on causal learning during early childhood limits educators to theories that only take child-directed learning into account.
-While computational models of children's causal learning exist (e.g., Kosoy et al., 2022; Gopnik et al.~2004; Sobel, 2014; Oudeyer \& Smith, 2014; Twomey \& Westermann, 2016; Bonawitz et al., 2022; Colantonio et al., in press), there is no pre-existing model which factors in pedagogy-type as a predictor of learning behaviors. By utilizing machine learning to train models both with-and-without the presence of diverse pedagogy categories, we can greatly expand the predictive power of causal learning models, which are currently limited to child-directed learning predictors.
-Our long-term goal is to establish predictive models of preschoolers' causal learning outcomes within naturalistic settings based upon teachers' pedagogical styles. The overall objective is to elucidate how interactions between pedagogy type, attentional patterns, and exploratory behavior inform competing computational models of causal learning outcomes and to train a best-performing model via machine learning. Our central hypotheses is as follows: causal learning models will perform best when taking granular pedagogy types into account. We aim to create and test competing computational models related to the interaction between pedagogy type and causal learning. We predict that prior computational models of causal learning that contain fewer pedagogy categories (or do not take pedagogy into account) will perform worse than pedagogy-diverse models of causal learning. Upon completion, our expected outcomes are to have established the interaction between adult instruction style and children's visual attention processes and exploratory behaviors within physical causal learning domains. These results will a) add valuable evidence to clarify developmentalists' theoretical and computational accounts of causal learning, and b) pave a way forward to support educators in developing effective curriculum for young students during a time of immense educational resource shortages.
+Developmentalists and educators have long debated the benefits of child-directed (Montessori style) exploration contra adult-directed (pedagogical) instruction on learning outcomes. While young children (age 3-6) often re-structure their hypotheses about the world based upon self-directed exploration á la Montessori, there are many subjects children cannot master without adult-directed pedagogical guidance (e.g., novel object labels, the alphabet, color and shape labels, historical events, the existence of entities such as germs, etc.). Such subjects are often culturally and linguistically bound, but even causal learning related to the physical properties of objects and entities can benefit from adult-directed pedagogy. Clarifying the extent to which pedagogy supports---and in some cases diminishes---effective causal learning is essential for a) informing teaching strategies in a time when many preparatory schools in the U.S. suffer from a lack of funding and teacher support (\textbf{SRCD?}; \textbf{NIERR?}), and b) elevating early education outcomes following relative dips in school preparedness over the past three years (Jalongo, 2021; (\textbf{gonzalez2022school?})).
+Those who have sought to address the impact of adult-directed pedagogy on causal learning describe a pedagogical trade-off model. This model proposes that adult instruction increases the proportion of time children spend exploring an object's pedagogy-relevant properties but limits their investigation of other properties. Conversely, child-directed exploration is understood to produce broader discovery of the complete set of an object's causal properties but diminish the time spent investigating any particular property.While such behavioral outcomes are established, little is known about the differential impact of diverse pedagogy types (such method tend to rely on one pedagogical condition statement, usually ``This is how my toy works'').
+In this project, we were interested in the relation between adults' use of language while teaching and children's learning outcomes. Specifically, we wanted to investigate how diverse and naturalistic pedagogy types that were produced to encourage children's play based upon findings from the pedagogy trade-off model would align with the pedagogy utilized within typical empirical methods for this model. To examine this, we took pre-existing text data from a survey where we asked UO students to watch a video depicting a toy and generate a text response detailing how they would go about teaching a preschooler about the toy. In one between subjects condition, they were instructed to `enhance' exploration (i.e., by providing pedagogy that would encourage a child to explore beyond one object property). In a second condition, they were instructed to `constrain exploration (i.e., by providing pedagogy that would encourage a child to only explore the one property demonstrated in the video).
+After presenting descriptives on the survey text dataset, we go on to describe three machine learning models to investigate different aims. The first model was created to predict the likelihood of a positive or negative sentiment occurring based upon the condition (enhance or constrain), source (qualtrics survey or pre-existing study pedagogy) and function (we included both a 'squeaker' and a `light' function in the object introduction video). The second model was created to predict the distance among expected outcomes paired via a manual coding system to the pedagogy samples from the survey (K-nearest neighbors). The third model again used logistic regression to create a best-performing model predicting child play outcomes (we collected in Fall of 2022 at the Oregon Museum of Science and Industry) from 4 pedagogy types used in that method.
 
 \hypertarget{methods}{%
 \section{Methods}\label{methods}}
 
-In Fall of 2022, we conducted a survey of undergraduate students (N = 168) at the University of Oregon, asking participants to report how they would teach a child about the causal properties of a novel object. Participants were randomly sorted into 2 conditions. In the `enhance' condition, participants were asked to generate pedagogy for two object properties intended to produce broad exploratory behaviors from a child (ex: ``What would you say to introduce this toy in a way that encourages wide-ranging exploration?''). In the `constrain' condition, participants were asked to generate pedagogy intended to produce limited exploratory behaviors from a child (ex: ``What would you say to introduce this toy in a way that discourages wide-ranging exploration?'').
+\begin{verbatim}
+In Fall of 2022, we conducted a Qualtrics survey of undergraduate students 
+\end{verbatim}
 
-We then (in the works) created a coding classifier system pairing participant-generated pedagogy with 7 pedagogy-type categories from previous research. These 7 pedagogy categories were linked to specific child outcomes from prior studies conducted by us as well as other labs. Using our child data outcome data paired with the coded participant-generated pedagogy, we are creating models to capture how well participants in our survey generated pedagogy which was most likely to produce the desired child outcomes.
+(N = 168) at the University of Oregon, asking participants to report how they
+would teach a child about the causal properties of a novel object. Participants
+were randomly sorted into 2 conditions. In the `enhance' condition, participants
+were instructed to generate pedagogy for two object properties with the intention
+to produce broad exploratory behaviors from a child (prompt: ``what would you say )
+to intoduce this toy in a way that encourages wide-ranging exploration?''). In the
+`constrain' condition, participants were asked to generate pedagogy intended to
+produce limited exploratory behaviors from a child (prompt: ``What would you say )
+to introduce this toy in a way that discourages wide-ranging exploration?''). We
+subsequently assessed overall word frequencies, and word frequencies by condition
+(see `Results: Descriptive Plots'). Next, we investigated the extent to which the
+`constrain' pedagogy differed in sentiment from the `enhance' pedagogy (see\\
+`Results: Model 1')
+In Model 2, we utilized a coding classifier system pairing
+participant-generated pedagogy with 7 pedagogy-type categories from previous
+research. These 7 pedagogy categories were linked to specific child outcomes from
+prior studies conducted by us as well as other labs. See Results: Model 2 for the
+model performance. Finally, using child data outcome data from our lab, we created
+a model to predict child outcomes based upon four pedagogy types from that study
+(Model 3). Having previously paired these four pedagogy types with items on the
+7-point scale, this gives us the ability to indirectly assess the likelihood that
+the survey-generated pedagogy text data will produce the desired child outcomes.
 
-\hypertarget{outline-describe-models-see-whether-bagged-tree-or-random-forest-model-better-predicts-the-sentiment-of-pedagogyuse-this-to-see-if-some-pedagogy-sentiment-groups-are-tied-to-certain-child-outcomes-coding-system-variables-etc.}{%
-\subsubsection{outline: describe models (see whether bagged tree or random forest model better predicts the sentiment of pedagogy--use this to see if some pedagogy sentiment groups are tied to certain child outcomes), coding system, variables, etc.}\label{outline-describe-models-see-whether-bagged-tree-or-random-forest-model-better-predicts-the-sentiment-of-pedagogyuse-this-to-see-if-some-pedagogy-sentiment-groups-are-tied-to-certain-child-outcomes-coding-system-variables-etc.}}
+\hypertarget{results-descriptive-plots-word-counts}{%
+\section{Results: Descriptive plots (word counts)}\label{results-descriptive-plots-word-counts}}
 
-\hypertarget{coding-system-based-on-rank-order-created-for-gen-survey}{%
-\subsubsection{Coding system: based on rank order created for gen survey}\label{coding-system-based-on-rank-order-created-for-gen-survey}}
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# parsing words from the \textquotesingle{}pedagogy\textquotesingle{} (text) column}
+\NormalTok{tidy\_words }\OtherTok{\textless{}{-}}\NormalTok{ mydata }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{unnest\_tokens}\NormalTok{(word, pedagogy)}
+
+\CommentTok{\# removing numbers}
+\NormalTok{tidy\_words }\OtherTok{\textless{}{-}}\NormalTok{ tidy\_words[}\SpecialCharTok{{-}}\FunctionTok{grep}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{b}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{d+}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{b"}\NormalTok{, tidy\_words}\SpecialCharTok{$}\NormalTok{word),]}
+
+\CommentTok{\# removing common/under{-}informative words}
+\NormalTok{exclu }\OtherTok{\textless{}{-}} \FunctionTok{tibble}\NormalTok{(}\AttributeTok{word =} \FunctionTok{c}\NormalTok{(}\StringTok{"the"}\NormalTok{, }\StringTok{"this"}\NormalTok{, }\StringTok{"I"}\NormalTok{))}
+
+\NormalTok{tidy\_words }\OtherTok{\textless{}{-}}\NormalTok{ tidy\_words }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{anti\_join}\NormalTok{(exclu, }\AttributeTok{by =} \StringTok{"word"}\NormalTok{)}
+
+
+\CommentTok{\#plot}
+\NormalTok{tidy\_words }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{anti\_join}\NormalTok{(stop\_words) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{count}\NormalTok{(word, }\AttributeTok{sort =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{word =} \FunctionTok{reorder}\NormalTok{(word, n)) }\SpecialCharTok{\%\textgreater{}\%} \CommentTok{\# make y{-}axis ordered by n}
+  \FunctionTok{slice}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{15}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \CommentTok{\# select only the first 15 rows}
+  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(n, word)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_col}\NormalTok{(}\AttributeTok{fill =} \StringTok{"royalblue"}\NormalTok{, }\AttributeTok{alpha =}\NormalTok{ .}\DecValTok{7}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_x\_continuous}\NormalTok{(}\AttributeTok{expand =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}
+    \AttributeTok{panel.grid.major.y =} \FunctionTok{element\_blank}\NormalTok{(),}
+    \AttributeTok{panel.grid.minor.x =} \FunctionTok{element\_blank}\NormalTok{(),}
+    \AttributeTok{panel.grid.major.x =} \FunctionTok{element\_line}\NormalTok{(}\AttributeTok{color =} \StringTok{"gray80"}\NormalTok{)}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{x =} \StringTok{"Word Frequency"}\NormalTok{,}
+    \AttributeTok{y =} \StringTok{"Word"}\NormalTok{,}
+    \AttributeTok{title =} \StringTok{"Figure 1: Top 15 most frequently occurring words across all pedagogy types"}\NormalTok{,}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
 
 \includegraphics{capstone640_files/figure-latex/initial plots-1.pdf}
 
+\hypertarget{figure-2-word-frequency-cloud-across-conditions}{%
+\section{Figure 2: Word Frequency Cloud (Across Conditions)}\label{figure-2-word-frequency-cloud-across-conditions}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# visualing: word cloud}
+\FunctionTok{library}\NormalTok{(wordcloud)}
+
+\NormalTok{tokens }\OtherTok{=}\NormalTok{ textdata }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{unnest\_tokens}\NormalTok{(word, text) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{anti\_join}\NormalTok{(stop\_words)}
+
+\CommentTok{\# top words}
+\NormalTok{word\_count }\OtherTok{=}\NormalTok{ tokens}\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(word)}\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{count =} \FunctionTok{n}\NormalTok{())}\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{arrange}\NormalTok{(}\FunctionTok{desc}\NormalTok{(count))}\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{slice}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{)}
+
+
+\CommentTok{\# word cloud{-}{-}zoom in}
+\NormalTok{cloud }\OtherTok{\textless{}{-}}\NormalTok{ tokens }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(source, word) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{count =} \FunctionTok{n}\NormalTok{())}\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{arrange}\NormalTok{(}\FunctionTok{desc}\NormalTok{(count))}\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{slice}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{)}
+  
+
+\FunctionTok{wordcloud}\NormalTok{(tokens}\SpecialCharTok{$}\NormalTok{word, }\AttributeTok{max.words =} \DecValTok{75}\NormalTok{, }\AttributeTok{colors=}\FunctionTok{brewer.pal}\NormalTok{(}\DecValTok{6}\NormalTok{, }\StringTok{"Dark2"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
 \includegraphics{capstone640_files/figure-latex/word cloud-1.pdf}
 
-\#\#discussion of graph by condition
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tidy\_words }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{group\_by}\NormalTok{(condition) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{anti\_join}\NormalTok{(stop\_words) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{count}\NormalTok{(word, }\AttributeTok{sort =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{word =} \FunctionTok{reorder}\NormalTok{(word, n)) }\SpecialCharTok{\%\textgreater{}\%} \CommentTok{\# make y{-}axis ordered by n}
+  \FunctionTok{slice}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{15}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \CommentTok{\# select only the first 15 rows}
+  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(n, word, }\AttributeTok{fill =}\NormalTok{ condition)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_col}\NormalTok{(}\AttributeTok{alpha =}\NormalTok{ .}\DecValTok{7}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{facet\_wrap}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{condition) }\SpecialCharTok{+}
+  \FunctionTok{scale\_x\_continuous}\NormalTok{(}\AttributeTok{expand =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{0}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}
+    \AttributeTok{panel.grid.major.y =} \FunctionTok{element\_blank}\NormalTok{(),}
+    \AttributeTok{panel.grid.minor.x =} \FunctionTok{element\_blank}\NormalTok{(),}
+    \AttributeTok{panel.grid.major.x =} \FunctionTok{element\_line}\NormalTok{(}\AttributeTok{color =} \StringTok{"gray80"}\NormalTok{)}
+\NormalTok{  ) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}
+    \AttributeTok{x =} \StringTok{"Word Frequency"}\NormalTok{,}
+    \AttributeTok{y =} \StringTok{"Word"}\NormalTok{,}
+    \AttributeTok{title =} \StringTok{"Figure 3: Top 15 most frequently occurring words by condition"}\NormalTok{,}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
 
 \includegraphics{capstone640_files/figure-latex/unnamed-chunk-1-1.pdf}
+In Figure 3, we see the top 15 words used in the enhance and constrain
+conditions. In the `enahnce' condition, there was greater use of words like ``sounds,'' ``cool,'' ``pull,'' ``noises,'' and ``toys.'' In the `constrain' condition, there was greater use of ``touch,'' ``silver,'' ``push,'' and ``knob.''
 
-\hypertarget{sentiment-analysis}{%
-\subsubsection{sentiment analysis}\label{sentiment-analysis}}
-
-\hypertarget{sentiment-by-analysis-tool}{%
-\subsubsection{Sentiment by analysis tool}\label{sentiment-by-analysis-tool}}
+\hypertarget{description-of-sentiment-analysis}{%
+\subsubsection{Description of sentiment analysis}\label{description-of-sentiment-analysis}}
 
 \begin{table}
 
@@ -238,59 +386,57 @@ Pos bing & Neg bing & Pos nrc & Neg nrc & Pos loughran & Neg loughran & Pos afin
 \end{threeparttable}
 \end{table}
 
-\hypertarget{part-1-predicting-a-categorical-outcome-sentiment-pos-or-neg-using-regularized-logistic-regression}{%
-\subsection{Part 1: Predicting a Categorical Outcome (sentiment: pos or neg) using Regularized Logistic Regression}\label{part-1-predicting-a-categorical-outcome-sentiment-pos-or-neg-using-regularized-logistic-regression}}
+\hypertarget{model-1-predicting-a-categorical-outcome-sentiment-positive-or-negative-using-regularized-logistic-regression}{%
+\subsection{Model 1: Predicting a Categorical Outcome (sentiment: positive or negative) using Regularized Logistic Regression}\label{model-1-predicting-a-categorical-outcome-sentiment-positive-or-negative-using-regularized-logistic-regression}}
 
-\hypertarget{task-1.1-split-dataset-into-training-and-testing}{%
-\subsubsection{Task 1.1: split dataset into training and testing}\label{task-1.1-split-dataset-into-training-and-testing}}
+\begin{verbatim}
+## Generalized Linear Model 
+## 
+## 230 samples
+##   6 predictor
+##   2 classes: 'negative', 'positive' 
+## 
+## Recipe steps: zv 
+## Resampling: Cross-Validated (10 fold) 
+## Summary of sample sizes: 207, 207, 207, 207, 207, 207, ... 
+## Resampling results:
+## 
+##   logLoss  
+##   0.6264822
+\end{verbatim}
 
-\hypertarget{task-1.2-10-fold-cross-validation-without-regularization}{%
-\subsubsection{Task 1.2: 10-fold cross-validation without regularization}\label{task-1.2-10-fold-cross-validation-without-regularization}}
+\begin{verbatim}
+##    negative  positive
+## 1 0.7771235 0.2228765
+## 2 0.5675647 0.4324353
+## 3 0.7771235 0.2228765
+## 4 0.5675647 0.4324353
+## 5 0.5675647 0.4324353
+## 6 0.7771235 0.2228765
+\end{verbatim}
 
-caret\_mod \textless- caret::train(blueprint,
-data = sen\_tr,
-method = ``glm,''
-family = `binomial,'
-metric = `logLoss,'
-trControl = cv)
+\begin{verbatim}
+## [1] 0.02639752
+\end{verbatim}
 
-caret\_mod
+\begin{verbatim}
+## [1] 0.6140351
+\end{verbatim}
 
-\hypertarget{evaluate-the-model-on-the-test-data}{%
-\section{Evaluate the model on the test data}\label{evaluate-the-model-on-the-test-data}}
+\begin{verbatim}
+## [1] 0.7836039
+\end{verbatim}
 
-\hypertarget{predict-the-probabilities-for-the-observations-in-the-test-dataset}{%
-\section{Predict the probabilities for the observations in the test dataset}\label{predict-the-probabilities-for-the-observations-in-the-test-dataset}}
+\hypertarget{results-model-1}{%
+\section{Results Model 1}\label{results-model-1}}
 
-predicted\_test \textless- predict(caret\_mod, sen\_test, type=`prob')
+The first model is a regularized logistic regression predicting sentiment type (positive or negative) from a participant's condition (enhance or constrain), source (qualtrics survey or pre-existing study pedagogy) and function (`squeaker' or 'light). Results indicate that pedagogy did not differ significantly in sentiment based upon the condition participants were in\ldots{} Model performance\ldots.
 
-head(predicted\_test)
+\hypertarget{model-2-k-nearest-neighbors}{%
+\subsubsection{Model 2: K-nearest neighbors}\label{model-2-k-nearest-neighbors}}
 
-\hypertarget{evaluate-the-model-on-the-test-dataset}{%
-\section{Evaluate the model on the test dataset}\label{evaluate-the-model-on-the-test-dataset}}
-
-predicted\_te \textless- predict(caret\_mod, sen\_test)
-
-predicted\_te \textless- as.numeric(predicted\_te)
-sen\_test\_numeric \textless- sen\_test\$sentiment\_numeric
-
-predicted\_eval \textless- data.frame(predicted\_te, sen\_test\_numeric)
-predicted\_eval \textless- predicted\_eval{[}complete.cases(predicted\_eval), {]}
-
-rsq\_te \textless- cor(predicted\_eval\(predicted_te,predicted_eval\)sen\_test\_numeric)\^{}2
-rsq\_te
-
-\#mae\_te \textless- mean(abs(predicted)eval\$sen\_test\_numeric - predicted\_te))
-\# mae\_te
-
-rmse\_te \textless- sqrt(mean((oregon\_test\$score - predicted\_te)\^{}2))
-rmse\_te
-
-\hypertarget{will-discuss-this-more-in-1.5-but-the-model-without-regularization-doesnt-seem-to-be-the-best-for-predicting-outcomes-on-the-test-dataset.}{%
-\paragraph{Will discuss this more in 1.5, but the model without regularization doesn't seem to be the best for predicting outcomes on the test dataset.}\label{will-discuss-this-more-in-1.5-but-the-model-without-regularization-doesnt-seem-to-be-the-best-for-predicting-outcomes-on-the-test-dataset.}}
-
-\hypertarget{task-1.3-10-fold-cross-validation-with-ridge-penalty}{%
-\subsubsection{Task 1.3: 10-fold cross-validation with ridge penalty}\label{task-1.3-10-fold-cross-validation-with-ridge-penalty}}
+\hypertarget{model-3-logistic-regression-predicting-whether-a-particular-object-function-was-discovered}{%
+\subsubsection{Model 3: Logistic regression predicting whether a particular object function was discovered}\label{model-3-logistic-regression-predicting-whether-a-particular-object-function-was-discovered}}
 
 \begin{verbatim}
 ##   parameter   class                    label
@@ -304,9 +450,6 @@ According to the second lasso model, the optimal lambda value for lasso penalty 
 
 \hypertarget{find-and-report-the-most-important-10-predictors-of-sentiment-and-their-coefficients.}{%
 \subsubsection{Find and report the most important 10 predictors of sentiment and their coefficients.}\label{find-and-report-the-most-important-10-predictors-of-sentiment-and-their-coefficients.}}
-
-\hypertarget{data-analysis-logistic-regression-in-progress}{%
-\subsection{Data analysis: Logistic regression (in progress)}\label{data-analysis-logistic-regression-in-progress}}
 
 \hypertarget{k-nearest-neighbors-algorithm-to-predict-rank-ordered-exploration-promotion}{%
 \subsection{K-nearest neighbors algorithm to predict rank ordered exploration-promotion}\label{k-nearest-neighbors-algorithm-to-predict-rank-ordered-exploration-promotion}}
@@ -390,8 +533,11 @@ method = ``kknn,''
 trControl = cv,
 tuneGrid = grid)
 
-\hypertarget{results-in-progress}{%
-\section{Results (in progress)}\label{results-in-progress}}
+\hypertarget{results-model-2}{%
+\section{Results Model 2}\label{results-model-2}}
+
+\hypertarget{results-model-3}{%
+\section{Results Model 3}\label{results-model-3}}
 
 \hypertarget{discussion-in-progress}{%
 \section{Discussion (in progress)}\label{discussion-in-progress}}

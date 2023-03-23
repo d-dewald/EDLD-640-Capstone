@@ -14,17 +14,13 @@ affiliation:
     institution   : "University of Oregon"
 
 abstract: |
-
-  (will change wording to past tense once project is completed, and will add in results and discussion summary).. 
   
-  How is young children's exploration impacted by adult pedagogy? Can we create Machine Learning models to predict how a child will explore the causal features of an object based upon the pedagogy they are exposed to? Our goal is to establish predictive models of preschoolers' causal learning outcomes within educational settings based upon teachers' pedagogical styles. Using pre-existing samples of pedagogy and child outcomes, we...
-  
-  The rationale for this investigation is that determining the pedagogy-inclusive models predicting children's behavior in educational settings will allow us to predict cases where adult-directed instruction creates positive learning outcomes.
+  How is young children's exploration impacted by adult pedagogy? Can we create Machine Learning models to predict how a child will explore the causal features of an object based upon the pedagogy they are exposed to? Our goal is to establish predictive models of preschoolers' causal learning outcomes within educational settings based upon teachers' pedagogical styles. Using pre-existing samples of pedagogy and child outcomes, we created three machine learning models to capture 1) the extent to which adults produce pedagogy that is likely to have the intended effect on preschoolers' play behavior when prompted accordingly, and 2) the extent to which pedagogy that has different intent based upon the prompt differs in sentiment. We found that......
   
   
   <!-- https://tinyurl.com/ybremelq -->
 keywords          : "causal learning models, pedagogy, text analysis"
-wordcount         : "944"
+wordcount         : "1219"
 bibliography      : ["r-references.bib"]
 floatsintext      : no
 figurelist        : no
@@ -64,30 +60,7 @@ library(cutpointr)
 library(kableExtra)
 library(pastecs)
 
-```
-
-# Introduction
-  
-  Developmentalists and educators have long debated the benefits of child-directed (Montessori style) exploration contra adult-directed (pedagogical) instruction on learning outcomes.In this project, I investigate 
-  
-  The truth is that both provide valuable learning opportunities, but questions of how, in what cases, and for which individuals remain fuzzy. While young children (age 3-6) often re-structure their hypotheses about the world based upon self-directed exploration á la Montessori, there are many subjects children cannot master without adult-directed pedagogical guidance (e.g., novel object labels, the alphabet, color and shape labels, historical events, the existence of entities such as germs, etc.). Such subjects are often culturally and linguistically bound, but even causal learning related to the physical properties of objects and entities can benefit from adult-directed pedagogy. Clarifying the extent to which pedagogy supports—and in some cases diminishes—effective causal learning is essential for a) informing teaching strategies in a time when many preparatory schools in the U.S. suffer from a lack of funding and teacher support [@SRCD; @NIERR], and b) elevating early education outcomes following relative dips in school preparedness over the past three years (Jalongo, 2021; [@gonzalez2022school]).
-  In early childhood (age 3-6), children learn about causality through both self-directed and adult-directed methods. In recent years, adult-directed early education programs have undergone substantial changes in the U.S., yet the vast majority of causal learning models remain focused on child-directed learning outcomes. Those who have sought to address the impact of adult-directed pedagogy on causal learning describe a pedagogical trade-off model. This model proposes that adult instruction increases the proportion of time children spend exploring an object’s pedagogy-relevant properties but limits their investigation of other properties. Conversely, child-directed exploration is understood to produce broader discovery of the complete set of an object’s causal properties but diminish the time spent investigating any particular property. While such behavioral outcomes are established, little is known about the cognitive mechanisms that drive this pedagogical trade-off, how to computationally map the trade-off, and the extent to which computational models capture individual differences in learning outcomes. Failing to assess the differential impact of pedagogy on causal learning during early childhood limits educators to theories that only take child-directed learning into account. 
-  While computational models of children’s causal learning exist (e.g., Kosoy et al., 2022; Gopnik et al. 2004; Sobel, 2014; Oudeyer & Smith, 2014; Twomey & Westermann, 2016; Bonawitz et al., 2022; Colantonio et al., in press), there is no pre-existing model which factors in pedagogy-type as a predictor of learning behaviors. By utilizing machine learning to train models both with-and-without the presence of diverse pedagogy categories, we can greatly expand the predictive power of causal learning models, which are currently limited to child-directed learning predictors. 
-  Our long-term goal is to establish predictive models of preschoolers’ causal learning outcomes within naturalistic settings based upon teachers’ pedagogical styles. The overall objective is to elucidate how interactions between pedagogy type, attentional patterns, and exploratory behavior inform competing computational models of causal learning outcomes and to train a best-performing model via machine learning. Our central hypotheses is as follows: causal learning models will perform best when taking granular pedagogy types into account. We aim to create and test competing computational models related to the interaction between pedagogy type and causal learning. We predict that prior computational models of causal learning that contain fewer pedagogy categories (or do not take pedagogy into account) will perform worse than pedagogy-diverse models of causal learning. Upon completion, our expected outcomes are to have established the interaction between adult instruction style and children’s visual attention processes and exploratory behaviors within physical causal learning domains. These results will a) add valuable evidence to clarify developmentalists’ theoretical and computational accounts of causal learning, and b) pave a way forward to support educators in developing effective curriculum for young students during a time of immense educational resource shortages.
-
-# Methods
-  In Fall of 2022, we conducted a survey of undergraduate students (N = 168) at the University of Oregon, asking participants to report how they would teach a child about the causal properties of a novel object. Participants were randomly sorted into 2 conditions. In the 'enhance' condition, participants were asked to generate pedagogy for two object properties intended to produce broad exploratory behaviors from a child (ex: "What would you say to introduce this toy in a way that encourages wide-ranging exploration?"). In the 'constrain' condition, participants were asked to generate pedagogy intended to produce limited exploratory behaviors from a child (ex: "What would you say to introduce this toy in a way that discourages wide-ranging exploration?"). 
-  
-  We then (in the works) created a coding classifier system pairing participant-generated pedagogy with 7 pedagogy-type categories from previous research. These 7 pedagogy categories were linked to specific child outcomes from prior studies conducted by us as well as other labs. Using our child data outcome data paired with the coded participant-generated pedagogy, we are creating models to capture how well participants in our survey generated pedagogy which was most likely to produce the desired child outcomes.
-
-### outline: describe models (see whether bagged tree or random forest model better predicts the sentiment of pedagogy--use this to see if some pedagogy sentiment groups are tied to certain child outcomes), coding system, variables, etc.
-
-### Coding system: based on rank order created for gen survey
-
-
-```{r data cleaning, warning = FALSE}
-
-# loading datasets
+# loading data + data cleaning
 
 mydata <- import(here("data", "pedagogy_data.xlsx"))
 textdata <- import(here("data", "text_data.xlsx"))
@@ -112,7 +85,42 @@ rm(fun)
 
 ```
 
-```{r initial plots, warning = FALSE}
+# Introduction
+  
+  Developmentalists and educators have long debated the benefits of child-directed (Montessori style) exploration contra adult-directed (pedagogical) instruction on learning outcomes. While young children (age 3-6) often re-structure their hypotheses about the world based upon self-directed exploration á la Montessori, there are many subjects children cannot master without adult-directed pedagogical guidance (e.g., novel object labels, the alphabet, color and shape labels, historical events, the existence of entities such as germs, etc.). Such subjects are often culturally and linguistically bound, but even causal learning related to the physical properties of objects and entities can benefit from adult-directed pedagogy. Clarifying the extent to which pedagogy supports—and in some cases diminishes—effective causal learning is essential for a) informing teaching strategies in a time when many preparatory schools in the U.S. suffer from a lack of funding and teacher support [@SRCD; @NIERR], and b) elevating early education outcomes following relative dips in school preparedness over the past three years (Jalongo, 2021; [@gonzalez2022school]).
+   Those who have sought to address the impact of adult-directed pedagogy on causal learning describe a pedagogical trade-off model. This model proposes that adult instruction increases the proportion of time children spend exploring an object’s pedagogy-relevant properties but limits their investigation of other properties. Conversely, child-directed exploration is understood to produce broader discovery of the complete set of an object’s causal properties but diminish the time spent investigating any particular property.While such behavioral outcomes are established, little is known about the differential impact of diverse pedagogy types (such method tend to rely on one pedagogical condition statement, usually "This is how my toy works").
+   In this project, we were interested in the relation between adults' use of language while teaching and children's learning outcomes. Specifically, we wanted to investigate how diverse and naturalistic pedagogy types that were produced to encourage children's play based upon findings from the pedagogy trade-off model would align with the pedagogy utilized within typical empirical methods for this model. To examine this, we took pre-existing text data from a survey where we asked UO students to watch a video depicting a toy and generate a text response detailing how they would go about teaching a preschooler about the toy. In one between subjects condition, they were instructed to 'enhance' exploration (i.e., by providing pedagogy that would encourage a child to explore beyond one object property). In a second condition, they were instructed to 'constrain exploration (i.e., by providing pedagogy that would encourage a child to only explore the one property demonstrated in the video). 
+   After presenting descriptives on the survey text dataset, we go on to describe three machine learning models to investigate different aims. The first model was created to predict the likelihood of a positive or negative sentiment occurring based upon the condition (enhance or constrain), source (qualtrics survey or pre-existing study pedagogy) and function (we included both a 'squeaker' and a 'light' function in the object introduction video). The second model was created to predict the distance among expected outcomes paired via a manual coding system to the pedagogy samples from the survey (K-nearest neighbors). The third model again used logistic regression to create a best-performing model predicting child play outcomes (we collected in Fall of 2022 at the Oregon Museum of Science and Industry) from 4 pedagogy types used in that method. 
+  
+# Methods
+    In Fall of 2022, we conducted a Qualtrics survey of undergraduate students 
+  (N = 168) at the University of Oregon, asking participants to report how they
+  would teach a child about the causal properties of a novel object. Participants
+  were randomly sorted into 2 conditions. In the 'enhance' condition, participants
+  were instructed to generate pedagogy for two object properties with the intention
+  to produce broad exploratory behaviors from a child (prompt: "what would you say )
+  to intoduce this toy in a way that encourages wide-ranging exploration?"). In the
+  'constrain' condition, participants were asked to generate pedagogy intended to
+  produce limited exploratory behaviors from a child (prompt: "What would you say )
+  to introduce this toy in a way that discourages wide-ranging exploration?"). We
+  subsequently assessed overall word frequencies, and word frequencies by condition
+  (see 'Results: Descriptive Plots'). Next, we investigated the extent to which the
+  'constrain' pedagogy differed in sentiment from the 'enhance' pedagogy (see      
+  'Results: Model 1')
+     In Model 2, we utilized a coding classifier system pairing
+  participant-generated pedagogy with 7 pedagogy-type categories from previous 
+  research. These 7 pedagogy categories were linked to specific child outcomes from 
+  prior studies conducted by us as well as other labs. See Results: Model 2 for the 
+  model performance. Finally, using child data outcome data from our lab, we created
+  a model to predict child outcomes based upon four pedagogy types from that study 
+  (Model 3). Having previously paired these four pedagogy types with items on the 
+  7-point scale, this gives us the ability to indirectly assess the likelihood that 
+  the survey-generated pedagogy text data will produce the desired child outcomes.
+
+
+# Results: Descriptive plots (word counts)
+
+```{r initial plots, warning = FALSE, echo= TRUE}
 
 # parsing words from the 'pedagogy' (text) column
 tidy_words <- mydata %>%
@@ -146,12 +154,12 @@ tidy_words %>%
   labs(
     x = "Word Frequency",
     y = "Word",
-    title = "Top 15 most frequently occurring words across all pedagogy types",
+    title = "Figure 1: Top 15 most frequently occurring words across all pedagogy types",
   )
 ```
 
-
-```{r word cloud, warning=FALSE}
+# Figure 2: Word Frequency Cloud (Across Conditions)
+```{r word cloud, warning=FALSE, echo=TRUE}
 
 # visualing: word cloud
 library(wordcloud)
@@ -181,10 +189,7 @@ wordcloud(tokens$word, max.words = 75, colors=brewer.pal(6, "Dark2"))
 
 ```
 
-##discussion of graph by condition
-
-
-```{r, warning=FALSE}
+```{r, warning=FALSE, echo=TRUE}
 tidy_words %>% 
   group_by(condition) %>%
   anti_join(stop_words) %>% 
@@ -204,10 +209,11 @@ tidy_words %>%
   labs(
     x = "Word Frequency",
     y = "Word",
-    title = "Top 15 most frequently occurring words by condition",
+    title = "Figure 3: Top 15 most frequently occurring words by condition",
   )
 ```
-
+In Figure 3, we see the top 15 words used in the enhance and constrain 
+conditions. In the 'enahnce' condition, there was greater use of words like "sounds", "cool", "pull", "noises", and "toys". In the 'constrain' condition, there was greater use of "touch", "silver", "push", and "knob."
 
 ```{r analysis-preferences, include = FALSE, warning = FALSE}
 # Seed for random number generation
@@ -216,50 +222,45 @@ knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
 ```
 
 
-### sentiment analysis
-
-
 ```{r, warning = FALSE}
 
 # devtools::install_github("rstudio/reticulate")
 
- require(reticulate)
+# require(reticulate)
 
-Sys.setenv(RETICULATE_PYTHON = "C:/Users/ddewa/AppData/Local/r-miniconda/envs/capstone/python.exe")
+#Sys.setenv(RETICULATE_PYTHON = "C:/Users/ddewa/AppData/Local/r-miniconda/envs/capstone/python.exe")
 
-conda_install(envname = 'capstone', 
-              packages = 'torch', 
-              pip = TRUE, 
-              force = TRUE)
+#conda_install(envname = 'capstone', 
+ #             packages = 'torch', 
+  #            pip = TRUE, 
+   #           force = TRUE)
 
-conda_install(envname = 'capstone',
-              packages = 'transformers',
-              pip=TRUE, 
-              force=TRUE)
+#conda_install(envname = 'capstone',
+ #             packages = 'transformers',
+  #            pip=TRUE, 
+   #           force=TRUE)
 
-conda_install(envname = 'capstone',
-              packages = 'protobuf',
-              pip=TRUE, 
-              force=TRUE)
+#conda_install(envname = 'capstone',
+ #             packages = 'protobuf',
+  #            pip=TRUE, 
+   #           force=TRUE)
 
 
-reticulate::use_condaenv("capstone")
+#reticulate::use_condaenv("capstone")
 
-transformers <- reticulate::import('transformers')
+#transformers <- reticulate::import('transformers')
 
-model_path <- "cardiffnlp/twitter-xlm-roberta-base-sentiment"
+#model_path <- "cardiffnlp/twitter-xlm-roberta-base-sentiment"
 
-sentiment_task <- transformers$pipeline("sentiment-analysis", 
-                                         model=model_path, 
-                                         tokenizer=model_path)
-
+#sentiment_task <- transformers$pipeline("sentiment-analysis", 
+ #                                        model=model_path, 
+  #                                       tokenizer=model_path)
+#
 
 
 ```
 
-
-
-### Sentiment by analysis tool
+### Description of sentiment analysis
 
 ```{r, warning=FALSE}
 # sentiment analysis
@@ -294,10 +295,6 @@ sentiment_by_condition <- sentimentdata %>%
   group_by(condition, analysis) %>%
   count(sentiment)
 
-sentiment <- sentiment %>%
-  group_by(condition) %>%
-  count(sentiment)
-
 # table of sentiment for four groups ("bing", "nrc", "afinn", "loughran")
 sentimenttable <- import(here("data", "sentiment_table.xlsx"))
 table <- sentimenttable[1:2, 2:11]
@@ -316,15 +313,9 @@ table %>%
 ```
 
 
+## Model 1: Predicting a Categorical Outcome (sentiment: positive or negative) using Regularized Logistic Regression
 
-
-
-
-
-
-## Part 1: Predicting a Categorical Outcome (sentiment: positive or negative) using Regularized Logistic Regression
-
-```{r part1_prep, warning = FALSE}
+```{r part1_prep, warning = FALSE, include=TRUE}
 
 # Recipe for the sentiment dataset
 
@@ -339,11 +330,8 @@ categorical <- c('condition', 'source', 'function')
                     roles = c(rep('predictor',3), 'outcome', 'ID')) %>%
   step_zv(all_of(categorical)) 
 
-```
 
-### Task 1.1: split dataset into training and testing
-
-```{r 1.1, warning = FALSE}
+# splitting data into training and testing
 # Let the training data have the 80% of cases and the test data have the 20% of the cases.
 
 set.seed(11102021)  # for reproducibility
@@ -352,12 +340,7 @@ sen      <- sample(1:nrow(sentiment), round(nrow(sentiment) * 0.8))
 sen_train  <- sentiment[sen, ]
 sen_test  <- sentiment[-sen, ]
 
-```
-
-
-### Task 1.2: 10-fold cross-validation without regularization
-
-```{r 1.2, warning = FALSE}
+# 10-fold cross-validation without regularization
 
 set.seed(11152021) # for reproducibility
 
@@ -400,7 +383,6 @@ sen.indices <- vector('list',10)
 head(predicted_test)
 
 
-
 # Evaluate the model on the test dataset
 predicted_te <- predict(caret_mod, sen_test)
 
@@ -422,9 +404,12 @@ rmse_te <- sqrt(mean((predicted_eval$sen_test_numeric - predicted_eval$predicted
 rmse_te
 ```
 
-  Model performance:
+# Results Model 1 
+The first model is a regularized logistic regression predicting sentiment type (positive or negative) from a participant's condition (enhance or constrain), source (qualtrics survey or pre-existing study pedagogy) and function ('squeaker' or 'light). Results indicate that pedagogy did not differ significantly in sentiment based upon the condition participants were in... Model performance....
 
-### Task 1.3: 10-fold cross-validation with ridge penalty
+### Model 2: K-nearest neighbors 
+
+### Model 3: Logistic regression predicting whether a particular object function was discovered
 ```{r 1.3 ridge, warning = FALSE}
  caret::getModelInfo()$glmnet$parameters
 
@@ -462,9 +447,6 @@ According to the second lasso model, the optimal lambda value for lasso penalty 
 ### Find and report the most important 10 predictors of sentiment and their coefficients. 
 
 
-
-
-## Data analysis: Logistic regression predicting whether a particular object function was discovered
 
 ```{r, include = TRUE, warning= FALSE, include=FALSE}
 
@@ -639,8 +621,9 @@ blueprint_textdummy <- recipe(x  = textdummy,
 
 
 
-# Results (in progress)
 
+# Results Model 2
+# Results Model 3
 # Discussion (in progress)
 
 
