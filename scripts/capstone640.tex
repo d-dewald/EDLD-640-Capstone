@@ -617,11 +617,66 @@ rmse\_te: 0.784
                                         \AttributeTok{method    =} \StringTok{"kknn"}\NormalTok{,}
                                         \AttributeTok{trControl =}\NormalTok{ cv,}
                                         \AttributeTok{tuneGrid  =}\NormalTok{ grid)}
+  
+  \FunctionTok{plot}\NormalTok{(caret\_knn)}
 \end{Highlighting}
 \end{Shaded}
 
+\includegraphics{capstone640_files/figure-latex/unnamed-chunk-4-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{  caret\_knn}\SpecialCharTok{$}\NormalTok{bestTune}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     kmax distance      kernel
+## 136   25        2 rectangular
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# checking performance of knn algorithm on test dataset}
+\NormalTok{predicted\_te }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(caret\_knn}\SpecialCharTok{$}\NormalTok{finalModel, }\AttributeTok{newdata =}\NormalTok{ rank\_te)}
+
+\CommentTok{\# r{-}square}
+\FunctionTok{cor}\NormalTok{(rank\_te}\SpecialCharTok{$}\NormalTok{rank, predicted\_te)}\SpecialCharTok{\^{}}\DecValTok{2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.6127713
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# rmse}
+\FunctionTok{sqrt}\NormalTok{(}\FunctionTok{mean}\NormalTok{((rank\_te}\SpecialCharTok{$}\NormalTok{rank }\SpecialCharTok{{-}}\NormalTok{ predicted\_te)}\SpecialCharTok{*}\DecValTok{2}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.85
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# mae}
+\FunctionTok{mean}\NormalTok{(}\FunctionTok{abs}\NormalTok{(rank\_te}\SpecialCharTok{$}\NormalTok{rank }\SpecialCharTok{{-}}\NormalTok{predicted\_te))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.94125
+\end{verbatim}
+
 \hypertarget{results-model-2}{%
 \section{Results Model 2}\label{results-model-2}}
+
+r-square: 0.613
+rmse: 0.85
+mae: 0.941
 
 \hypertarget{model-3-logistic-regression-predicting-whether-a-particular-object-function-was-discovered}{%
 \subsubsection{Model 3: Logistic regression predicting whether a particular object function was discovered}\label{model-3-logistic-regression-predicting-whether-a-particular-object-function-was-discovered}}
