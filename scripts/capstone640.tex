@@ -681,21 +681,156 @@ mae: 0.941
 \hypertarget{model-3-logistic-regression-predicting-whether-a-particular-object-function-was-discovered}{%
 \subsubsection{Model 3: Logistic regression predicting whether a particular object function was discovered}\label{model-3-logistic-regression-predicting-whether-a-particular-object-function-was-discovered}}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# omsi \textless{}{-} import(here("data", "omsidata.xlsx"))}
+\NormalTok{omsi }\OtherTok{\textless{}{-}} \FunctionTok{import}\NormalTok{(}\FunctionTok{here}\NormalTok{(}\StringTok{"data"}\NormalTok{, }\StringTok{"omsi.xlsx"}\NormalTok{))}
+
+\NormalTok{outcome }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}squeaker\_discovered\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{ID }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}participant\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{categorical }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}condition\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}gender\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}total\_time\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}unique\_actions\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}squeak\_time\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}target\_functions\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}total\_functions\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}age\_months\textquotesingle{}}\NormalTok{)}
+
+\CommentTok{\# old blueprint for data w/ character values:}
+\CommentTok{\# blueprint \textless{}{-} recipe(x  = omsi,}
+\CommentTok{\#                    vars  = c(categorical, outcome, ID),}
+\CommentTok{\#                    roles = c(rep(\textquotesingle{}predictor\textquotesingle{}),\textquotesingle{}outcome\textquotesingle{},\textquotesingle{}ID\textquotesingle{})) \%\textgreater{}\%}
+\CommentTok{\#  step\_indicate\_na(all\_of(categorical)) \%\textgreater{}\%}
+\CommentTok{\#  step\_zv(all\_of(categorical)) \%\textgreater{}\%}
+\CommentTok{\#    step\_num2factor(outcome,}
+\CommentTok{\#                  transform = function(x) x + 1,}
+\CommentTok{\#                  levels=c(\textquotesingle{}Y\textquotesingle{}, \textquotesingle{}N\textquotesingle{})) \%\textgreater{}\%}
+\CommentTok{\#  step\_num2factor(condition, }
+\CommentTok{\#                  transform = function(x) x + 1,}
+\CommentTok{\#                  levels=c(\textquotesingle{}ped1\textquotesingle{}, \textquotesingle{}baseline\textquotesingle{}, \textquotesingle{}interrupted\textquotesingle{}, \textquotesingle{}naive\textquotesingle{}))}
+ 
+ 
+\CommentTok{\# omsi blueprint}
+\NormalTok{ blueprint }\OtherTok{\textless{}{-}} \FunctionTok{recipe}\NormalTok{(}\AttributeTok{x  =}\NormalTok{ omsi,}
+                    \AttributeTok{vars  =} \FunctionTok{colnames}\NormalTok{(omsi),}
+                    \AttributeTok{roles =} \FunctionTok{c}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\StringTok{\textquotesingle{}predictor\textquotesingle{}}\NormalTok{,}\DecValTok{8}\NormalTok{), }\StringTok{\textquotesingle{}outcome\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}ID\textquotesingle{}}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+   \FunctionTok{step\_zv}\NormalTok{(}\FunctionTok{all\_numeric}\NormalTok{()) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{step\_nzv}\NormalTok{(}\FunctionTok{all\_numeric}\NormalTok{()) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{step\_impute\_mean}\NormalTok{(}\FunctionTok{all\_numeric}\NormalTok{()) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{step\_normalize}\NormalTok{(}\FunctionTok{all\_numeric\_predictors}\NormalTok{()) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{step\_corr}\NormalTok{(}\FunctionTok{all\_numeric}\NormalTok{(),}\AttributeTok{threshold=}\FloatTok{0.9}\NormalTok{)}
+
+
+\CommentTok{\# splitting data into training and testing}
+\CommentTok{\# Let the training data have the 80\% of cases and the test data have the 20\% of the cases.}
+
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{11102021}\NormalTok{)  }\CommentTok{\# for reproducibility}
+  
+\NormalTok{om     }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\FunctionTok{nrow}\NormalTok{(omsi), }\FunctionTok{round}\NormalTok{(}\FunctionTok{nrow}\NormalTok{(omsi) }\SpecialCharTok{*} \FloatTok{0.8}\NormalTok{))}
+\NormalTok{omsi\_tr  }\OtherTok{\textless{}{-}}\NormalTok{ omsi[om, ]}
+\NormalTok{omsi\_te}\OtherTok{\textless{}{-}}\NormalTok{ omsi[}\SpecialCharTok{{-}}\NormalTok{om, ]}
+
+\CommentTok{\# 10{-}fold cross{-}validation without regularization}
+
+\NormalTok{omsi\_tr }\OtherTok{=}\NormalTok{ omsi\_tr[}\FunctionTok{sample}\NormalTok{(}\FunctionTok{nrow}\NormalTok{(omsi\_tr)),]}
+
+  \CommentTok{\# Creating 10 folds with equal size}
+
+\NormalTok{folds }\OtherTok{=} \FunctionTok{cut}\NormalTok{(}\FunctionTok{seq}\NormalTok{(}\DecValTok{1}\NormalTok{,}\FunctionTok{nrow}\NormalTok{(omsi\_tr)),}\AttributeTok{breaks=}\DecValTok{10}\NormalTok{,}\AttributeTok{labels=}\ConstantTok{FALSE}\NormalTok{)}
+  
+  \CommentTok{\# Creating the list for each fold }
+\NormalTok{sen.indices }\OtherTok{\textless{}{-}} \FunctionTok{vector}\NormalTok{(}\StringTok{\textquotesingle{}list\textquotesingle{}}\NormalTok{,}\DecValTok{10}\NormalTok{)}
+
+      \ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{)\{}
+\NormalTok{        sen.indices[[i]] }\OtherTok{\textless{}{-}} \FunctionTok{which}\NormalTok{(folds}\SpecialCharTok{!=}\NormalTok{i)}
+\NormalTok{      \}}
+    
+
+\NormalTok{ cv }\OtherTok{\textless{}{-}} \FunctionTok{trainControl}\NormalTok{(}\AttributeTok{method    =} \StringTok{"cv"}\NormalTok{,}
+                   \AttributeTok{index           =}\NormalTok{ sen.indices)}
+    
+\CommentTok{\# Train the model}
+\NormalTok{ grid }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{ (}\AttributeTok{alpha =} \DecValTok{0}\NormalTok{, }\AttributeTok{lambda=} \FunctionTok{seq}\NormalTok{(}\FloatTok{0.01}\NormalTok{, }\DecValTok{3}\NormalTok{, .}\DecValTok{01}\NormalTok{))}
+ 
+\NormalTok{ ridge }\OtherTok{\textless{}{-}}\NormalTok{ caret}\SpecialCharTok{::}\FunctionTok{train}\NormalTok{(blueprint, }
+                          \AttributeTok{data      =}\NormalTok{ omsi\_tr, }
+                          \AttributeTok{method    =} \StringTok{"glmnet"}\NormalTok{,}
+                          \AttributeTok{trControl =}\NormalTok{ cv, }
+                          \AttributeTok{tuneGrid =}\NormalTok{ grid)}
+ 
+\CommentTok{\# ridge$results}
+\NormalTok{ ridge}\SpecialCharTok{$}\NormalTok{bestTune}
+\end{Highlighting}
+\end{Shaded}
+
 \begin{verbatim}
-##   parameter   class                    label
-## 1     alpha numeric        Mixing Percentage
-## 2    lambda numeric Regularization Parameter
+##   alpha lambda
+## 6     0   0.06
 \end{verbatim}
 
-The optimal lambda value for a lasso penalty was \_\_\_\_\_
+\begin{Shaded}
+\begin{Highlighting}[]
+ \FunctionTok{plot}\NormalTok{(ridge)}
+\end{Highlighting}
+\end{Shaded}
 
-According to the second lasso model, the optimal lambda value for lasso penalty is \_\_\_\_\_\_\_
+\includegraphics{capstone640_files/figure-latex/unnamed-chunk-5-1.pdf}
 
-\hypertarget{find-and-report-the-most-important-10-predictors-of-sentiment-and-their-coefficients.}{%
-\subsubsection{Find and report the most important 10 predictors of sentiment and their coefficients.}\label{find-and-report-the-most-important-10-predictors-of-sentiment-and-their-coefficients.}}
+\begin{Shaded}
+\begin{Highlighting}[]
+ \CommentTok{\# Evaluate the model on the test data}
+
+\CommentTok{\# Predict the probabilities for the observations in the test dataset}
+ 
+\NormalTok{ predicted\_te\_ridge }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(ridge, omsi\_te)}
+
+\NormalTok{rsq\_te }\OtherTok{\textless{}{-}} \FunctionTok{cor}\NormalTok{(predicted\_te\_ridge, omsi\_te}\SpecialCharTok{$}\NormalTok{squeaker\_discovered)}\SpecialCharTok{\^{}}\DecValTok{2}  
+\CommentTok{\# rsq\_te}
+
+\NormalTok{mae\_te }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(}\FunctionTok{abs}\NormalTok{(omsi\_te}\SpecialCharTok{$}\NormalTok{squeaker\_discovered }\SpecialCharTok{{-}}\NormalTok{ predicted\_te\_ridge))}
+\CommentTok{\# mae\_te}
+
+\NormalTok{rmse\_te }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(}\FunctionTok{mean}\NormalTok{((omsi\_te}\SpecialCharTok{$}\NormalTok{squeaker\_discovered }\SpecialCharTok{{-}}\NormalTok{predicted\_te\_ridge)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{))}
+\CommentTok{\# rmse\_te}
+
+
+
+\CommentTok{\# variable importance}
+\FunctionTok{require}\NormalTok{(vip)}
+
+\FunctionTok{vip}\NormalTok{(ridge, }\AttributeTok{num\_features =} \DecValTok{10}\NormalTok{, }\AttributeTok{geom =} \StringTok{"point"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{theme\_bw}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{capstone640_files/figure-latex/unnamed-chunk-5-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{coefs }\OtherTok{\textless{}{-}} \FunctionTok{coef}\NormalTok{(ridge}\SpecialCharTok{$}\NormalTok{finalModel,ridge}\SpecialCharTok{$}\NormalTok{bestTune}\SpecialCharTok{$}\NormalTok{lambda)}
+
+\NormalTok{ind   }\OtherTok{\textless{}{-}} \FunctionTok{order}\NormalTok{(}\FunctionTok{abs}\NormalTok{(coefs),}\AttributeTok{decreasing=}\NormalTok{T)}
+
+\FunctionTok{head}\NormalTok{(}\FunctionTok{as.matrix}\NormalTok{(coefs[ind[}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{],]),}\DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                             [,1]
+## unique_actions       0.545425593
+## total_time           0.147585830
+## squeak_time         -0.087064667
+## participant         -0.067041738
+## age_months           0.060184145
+## squeaker_discovered -0.029554122
+## condition           -0.023706733
+## gender              -0.003659261
+\end{verbatim}
 
 \hypertarget{results-model-3}{%
 \section{Results Model 3}\label{results-model-3}}
+
+rsq: 0.00051
+mae: 0.674
+rmse: 0.833
+
+The most important varialbes impacting whether or not the squeaker was discovered were (in order): number of unique actions, total play time, squeaker play time, participant, age in months, condition, and gender.
 
 \hypertarget{discussion}{%
 \section{Discussion}\label{discussion}}

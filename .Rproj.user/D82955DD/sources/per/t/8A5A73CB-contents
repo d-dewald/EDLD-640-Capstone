@@ -524,135 +524,120 @@ mean(abs(rank_te$rank -predicted_te))
  mae: 0.941
  
 ### Model 3: Logistic regression predicting whether a particular object function was discovered
-```{r 1.3 ridge, warning = FALSE}
- caret::getModelInfo()$glmnet$parameters
 
-# currently getting this error when running ridge and lasso penalty: Error in { : 
-#  task 1 failed - "error in evaluating the argument 'x' in selecting a method for function 'as.matrix': invalid class 'NA' to dup_mMatrix_as_dgeMatrix"
-# In addition: There were 20 warnings (use warnings() to see them)
+```{r, include = TRUE, warning= FALSE, echo=TRUE}
 
-
-grid_ridge <- data.frame(alpha = 0, lambda = seq(0.01,2,.01)) 
-# grid
-  
-#  ridge <- caret::train(blueprint, 
-#                        data      = sen_train, 
-#                        method    = "glmnet",
-#                        family = 'binomial', 
-#                        metric = 'logLoss',
-#                        trControl = cv,
-#                        tuneGrid  = grid_ridge)
-  
-# ridge$results
-
-
-# ridge$bestTune
-  
-# plot(ridge)
-```
-
-
-The optimal lambda value for a lasso penalty was _____
-
-
-According to the second lasso model, the optimal lambda value for lasso penalty is _______
-
-
-### Find and report the most important 10 predictors of sentiment and their coefficients. 
-
-
-
-```{r, include = TRUE, warning= FALSE, include=FALSE}
-
-omsi <- import(here("data", "omsidata.xlsx"))
-
-omsi$condition <- as.factor(omsi$condition)
+# omsi <- import(here("data", "omsidata.xlsx"))
+omsi <- import(here("data", "omsi.xlsx"))
 
 outcome <- c('squeaker_discovered')
 
 ID <- c('participant')
 
-categorical <- c('condition')
+categorical <- c('condition', 'gender', 'total_time', 'unique_actions', 'squeak_time', 'target_functions', 'total_functions', 'age_months')
 
-# Problem: currently getting an error when I try to train the model.The error is coming from step_medianimpute(). step_medianimpute() requires all the variables to be numeric but it is being passed factor variables with all_predictors().One way to fix this problem is by rearranging your recipe to create dummy variables before you impute.need to dummy code
-
-blueprint <- recipe(x  = omsi,
-                    vars  = c(categorical, outcome, ID),
-                    roles = c(rep('predictor'),'outcome','ID')) %>%
-  step_indicate_na(all_of(categorical)) %>%
-  step_zv(all_of(categorical)) %>%
-    step_num2factor(outcome,
-                  transform = function(x) x + 1,
-                  levels=c('Y', 'N')) %>%
-  step_num2factor(condition, 
-                  transform = function(x) x + 1,
-                  levels=c('ped1', 'baseline', 'interrupted', 'naive'))
+# old blueprint for data w/ character values:
+# blueprint <- recipe(x  = omsi,
+#                    vars  = c(categorical, outcome, ID),
+#                    roles = c(rep('predictor'),'outcome','ID')) %>%
+#  step_indicate_na(all_of(categorical)) %>%
+#  step_zv(all_of(categorical)) %>%
+#    step_num2factor(outcome,
+#                  transform = function(x) x + 1,
+#                  levels=c('Y', 'N')) %>%
+#  step_num2factor(condition, 
+#                  transform = function(x) x + 1,
+#                  levels=c('ped1', 'baseline', 'interrupted', 'naive'))
  
-blueprint
+ 
+# omsi blueprint
+ blueprint <- recipe(x  = omsi,
+                    vars  = colnames(omsi),
+                    roles = c(rep('predictor',8), 'outcome', 'ID')) %>%
+   step_zv(all_numeric()) %>%
+    step_nzv(all_numeric()) %>%
+    step_impute_mean(all_numeric()) %>%
+    step_normalize(all_numeric_predictors()) %>%
+    step_corr(all_numeric(),threshold=0.9)
 
 
-# let's split into testing and training sets
+# splitting data into training and testing
 # Let the training data have the 80% of cases and the test data have the 20% of the cases.
 
 set.seed(11102021)  # for reproducibility
   
-ped     <- sample(1:nrow(omsi), round(nrow(omsi) * 0.8))
-ped_train  <- omsi[ped, ]
-ped_test  <- omsi[-ped, ]
+om     <- sample(1:nrow(omsi), round(nrow(omsi) * 0.8))
+omsi_tr  <- omsi[om, ]
+omsi_te<- omsi[-om, ]
 
+# 10-fold cross-validation without regularization
 
-# 10 fold cross validation
+omsi_tr = omsi_tr[sample(nrow(omsi_tr)),]
 
+  # Creating 10 folds with equal size
 
-set.seed(11152021) # for reproducibility
-
-omsi_tr = ped_train[sample(nrow(ped_train)),]
-
-  # Creating 10 folds with equal size (creating an empty list not currently working)
-
-folds_omsi = cut(seq(1,nrow(omsi_tr)),breaks=10,labels=FALSE)
+folds = cut(seq(1,nrow(omsi_tr)),breaks=10,labels=FALSE)
   
-# code currently providing error when I try to create an empty list
   # Creating the list for each fold 
-# omsi_indices <- vector(mode = 'list',length = 10)
-#      for(i in 1:10){
-#        omsi_indices[[i]] <- which(folds_omsi!=i)
-#      }
+sen.indices <- vector('list',10)
+
+      for(i in 1:10){
+        sen.indices[[i]] <- which(folds!=i)
+      }
     
-set.seed(125)
 
  cv <- trainControl(method    = "cv",
-                      classProbs      = TRUE,
-                   summaryFunction = mnLogLoss,
-                   number = 10)
- 
+                   index           = sen.indices)
     
-      
 # Train the model
-  
-# ped_mod <- caret::train(blueprint, 
-#                          data      = omsi_tr, 
-#                          method    = "glm",
-#                          family    = 'binomial',
-#                          metric    = 'logLoss',
-#                          trControl = cv)
-
-# ped_mod
-
-# Evaluate the model on the test data
+ grid <- data.frame (alpha = 0, lambda= seq(0.01, 3, .01))
+ 
+ ridge <- caret::train(blueprint, 
+                          data      = omsi_tr, 
+                          method    = "glmnet",
+                          trControl = cv, 
+                          tuneGrid = grid)
+ 
+# ridge$results
+ ridge$bestTune
+ plot(ridge)
+ 
+ # Evaluate the model on the test data
 
 # Predict the probabilities for the observations in the test dataset
+ 
+ predicted_te_ridge <- predict(ridge, omsi_te)
 
-# predicted_test <- predict(ped_mod, omsi_test, type='prob')
+rsq_te <- cor(predicted_te_ridge, omsi_te$squeaker_discovered)^2  
+# rsq_te
 
-# head(predicted_test)
+mae_te <- mean(abs(omsi_te$squeaker_discovered - predicted_te_ridge))
+# mae_te
+
+rmse_te <- sqrt(mean((omsi_te$squeaker_discovered -predicted_te_ridge)^2))
+# rmse_te
 
 
-# sentiment analysis notes
 
+# variable importance
+require(vip)
+
+vip(ridge, num_features = 10, geom = "point") + 
+  theme_bw()
+
+coefs <- coef(ridge$finalModel,ridge$bestTune$lambda)
+
+ind   <- order(abs(coefs),decreasing=T)
+
+# head(as.matrix(coefs[ind[-1],]),10)
 ```
 
 # Results Model 3
+rsq: 0.00051
+mae: 0.674
+rmse: 0.833
+
+The most important varialbes impacting whether or not the squeaker was discovered were (in order): number of unique actions, total play time, squeaker play time, participant, age in months, condition, and gender.
 
 
 # Discussion
