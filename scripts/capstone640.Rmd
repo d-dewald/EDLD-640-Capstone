@@ -20,7 +20,7 @@ abstract: |
   
   <!-- https://tinyurl.com/ybremelq -->
 keywords          : "causal learning models, pedagogy, text analysis"
-wordcount         : "1219"
+wordcount         : "1933"
 bibliography      : ["r-references.bib"]
 floatsintext      : no
 figurelist        : no
@@ -261,11 +261,15 @@ knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
 ```
 
 ### Description of sentiment analysis
+After trying for many hours to use the 'transformers' package from 'huggingface' via
+a virtual python environment without success, we decided to utilize sentiment 
+analysis program from "bing" to perform analyses for Model 1. We also utilized three
+other programs ("afinn", "loughran", and "nrc"), and a summary of their positive and
+negative assessments by condition is included in Table 1 at the end of this 
+document.
 
 ```{r, warning=FALSE}
-# sentiment analysis
-library(RColorBrewer)
-
+# sentiment analysis with nrc, afinn, loughran, and bing
 
 # sentiment1 = textdata %>% #this allows us to retain the row number/the tweet
 #  unnest_tokens(word, text)%>% # this unnests the tweets into words
@@ -287,6 +291,9 @@ library(RColorBrewer)
 #  anti_join(stop_words)%>% #removes common words (stop words)
 #  left_join(get_sentiments("afinn"))
 
+```
+
+```{r sent anal, warning=FALSE, echo=TRUE}
 
 sentimentdata <- import(here("data", "sentiment_an.xlsx"))
 sentiment <- import(here("data", "sentiment.xlsx"))
@@ -308,14 +315,12 @@ table %>%
   kable_classic(html_font = "Cambria") %>%
   column_spec(column = 1:10, width = "0.57in") %>%
   footnote(general_title = "Note.", footnote_as_chunk=TRUE, threeparttable=TRUE, general = "Positive (Pos) and Negative (Neg) sentiment analysis by individual words using 4 analysis tools: bing, nrc, loughran, and afinn. Results demonstrate that Total Positive & Negative sentiment was roughly equal by condition (enhance or constrain). However, positive sentiment was slightly higher for the enhance condition and negative sentiment was slight higher for the constrain condition, which is the expected result.") 
-
-
 ```
 
 
 ## Model 1: Predicting a Categorical Outcome (sentiment: positive or negative) using Regularized Logistic Regression
 
-```{r part1_prep, warning = FALSE, include=TRUE}
+```{r part1_prep, warning = FALSE, echo=TRUE}
 
 # Recipe for the sentiment dataset
 
@@ -372,7 +377,7 @@ sen.indices <- vector('list',10)
                           metric    = 'logLoss',
                           trControl = cv)
  
- caret_mod
+# caret_mod
  
  # Evaluate the model on the test data
 
@@ -380,7 +385,7 @@ sen.indices <- vector('list',10)
  
  predicted_test <- predict(caret_mod, sen_test, type='prob')
 
-head(predicted_test)
+# head(predicted_test)
 
 
 # Evaluate the model on the test dataset
@@ -395,19 +400,110 @@ predicted_eval <- predicted_eval[complete.cases(predicted_eval), ]
 
 
 rsq_te <- cor(predicted_eval$predicted_te,predicted_eval$sen_test_numeric)^2
-rsq_te
+# rsq_te
 
 mae_te <- mean(abs(predicted_eval$sen_test_numeric - predicted_eval$predicted_te))
- mae_te
+# mae_te
 
 rmse_te <- sqrt(mean((predicted_eval$sen_test_numeric - predicted_eval$predicted_te)^2))
-rmse_te
+# rmse_te
 ```
 
 # Results Model 1 
 The first model is a regularized logistic regression predicting sentiment type (positive or negative) from a participant's condition (enhance or constrain), source (qualtrics survey or pre-existing study pedagogy) and function ('squeaker' or 'light). Results indicate that pedagogy did not differ significantly in sentiment based upon the condition participants were in... Model performance....
 
-### Model 2: K-nearest neighbors 
+logLoss: 0.626
+rsq_te: 0.026
+mae_te: 0.614
+rmse_te: 0.784
+
+### Model 2: K-nearest neighbors to predict rank ordered exploration-promotion from pedagogy text sample
+```{r, warning=FALSE, echo=TRUE}
+# import data
+# textdummy <- import(here("data", "text_data_dummy.xlsx"))
+ textdummy <-import(here("data", "text_dummy.xlsx"))
+
+# train and test split
+
+set.seed(10152022) # for reproducibility
+
+loc <- sample(1:nrow(textdummy), round(nrow(textdummy) * 0.9))
+rank_tr <- textdummy[loc, ]
+rank_te <- textdummy[-loc, ]
+
+
+# create row indices for 10-folds
+
+  #randomly shuffle training data
+rank_tr = rank_tr[sample(nrow(rank_tr)),]
+
+
+    # Create 10 folds with equal size
+
+      folds = cut(seq(1,nrow(rank_tr)),breaks=10,labels=FALSE)
+  
+    # Create the list for each fold 
+      
+      my.indices <- vector('list',10)
+      for(i in 1:10){
+        my.indices[[i]] <- which(folds!=i)
+      }
+
+# Cross-validation settings
+      
+  cv <- trainControl(method = "cv",
+                     index  = my.indices)
+  
+require(caret)
+require(kknn)
+
+getModelInfo()$kknn$parameters
+
+
+# Hyperparameter Tuning Grid
+  
+  grid <- expand.grid(kmax    = 3:25,
+                     distance = c(1,2,3),
+                     kernel   = c('epanechnikov','rectangular'))
+ # grid
+  
+  
+require(doParallel)
+
+ncores <- 8    
+
+cl <- makePSOCKcluster(ncores)
+
+registerDoParallel(cl)
+
+
+# Train the model
+
+textdummy$source <- as.vector(textdummy$source)
+textdummy$rank <- as.vector(textdummy$rank)
+textdummy$condition <- as.vector(textdummy$condition)
+textdummy$funct <- as.vector(textdummy$funct)
+textdummy$id <- as.vector(textdummy$id)
+
+outcome <- c('rank')
+
+ID <- c('id')
+
+categorical <- c('condition', 'source', 'funct')
+
+blueprint_textdummy <- recipe(x  = textdummy,
+                    vars  = c(categorical, outcome, ID),
+                    roles = c(rep('predictor',3), 'outcome', 'ID')) 
+
+
+  caret_knn <- caret::train(blueprint_textdummy, 
+                                        data      = rank_tr,
+                                        method    = "kknn",
+                                        trControl = cv,
+                                        tuneGrid  = grid)
+  
+```
+# Results Model 2
 
 ### Model 3: Logistic regression predicting whether a particular object function was discovered
 ```{r 1.3 ridge, warning = FALSE}
@@ -538,93 +634,10 @@ set.seed(125)
 
 ```
 
-## K-nearest neighbors algorithm to predict rank ordered exploration-promotion
-
-# import data
-textdummy <- import(here("data", "text_data_dummy.xlsx"))
-
-# train and test split
-
-set.seed(10152022) # for reproducibility
-
-loc <- sample(1:nrow(textdummy), round(nrow(textdummy) * 0.9))
-rank_tr <- textdummy[loc, ]
-rank_te <- textdummy[-loc, ]
-
-
-# create row indices for 10-folds
-
-  #randomly shuffle training data
-rank_tr = rank_tr[sample(nrow(rank_tr)),]
-
-
-    # Create 10 folds with equal size
-
-      folds = cut(seq(1,nrow(rank_tr)),breaks=10,labels=FALSE)
-  
-    # Create the list for each fold 
-      
-      my.indices <- vector('list',10)
-      for(i in 1:10){
-        my.indices[[i]] <- which(folds!=i)
-      }
-
-# Cross-validation settings
-      
-  cv <- trainControl(method = "cv",
-                     index  = my.indices)
-  
-require(caret)
-require(kknn)
-
-getModelInfo()$kknn$parameters
-
-
-# Hyperparameter Tuning Grid
-  
-  grid <- expand.grid(kmax    = 3:25,
-                     distance = c(1,2,3),
-                     kernel   = c('epanechnikov','rectangular'))
-  grid
-  
-  
-require(doParallel)
-
-ncores <- 8    
-
-cl <- makePSOCKcluster(ncores)
-
-registerDoParallel(cl)
-
-
-# Train the model
-
-
-outcome <- c('rank')
-
-ID <- c('id')
-
-categorical <- c('condition', 'source', 'function')
-
-
-blueprint_textdummy <- recipe(x  = textdummy,
-                    vars  = c(categorical, outcome, ID),
-                    roles = c(rep('predictor',3), 'outcome', 'ID')) 
-
-
-  caret_knn <- caret::train(blueprint_textdummy, 
-                                        data      = rank_tr,
-                                        method    = "kknn",
-                                        trControl = cv,
-                                        tuneGrid  = grid)
-
-
-
-
-
-# Results Model 2
 # Results Model 3
-# Discussion (in progress)
+
+
+# Discussion
 
 
 \newpage

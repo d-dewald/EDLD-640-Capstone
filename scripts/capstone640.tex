@@ -179,7 +179,7 @@
   {}{\typeout{Failed to patch title.}}
 \makeatother
 \shorttitle{Natural Language Processing for Pedagogy}
-\keywords{causal learning models, pedagogy, text analysis\newline\indent Word count: 1219}
+\keywords{causal learning models, pedagogy, text analysis\newline\indent Word count: 1933}
 \DeclareDelayedFloatFlavor{ThreePartTable}{table}
 \DeclareDelayedFloatFlavor{lltable}{table}
 \DeclareDelayedFloatFlavor*{longtable}{table}
@@ -365,9 +365,41 @@ conditions. In the `enahnce' condition, there was greater use of words like ``so
 \hypertarget{description-of-sentiment-analysis}{%
 \subsubsection{Description of sentiment analysis}\label{description-of-sentiment-analysis}}
 
+After trying for many hours to use the `transformers' package from `huggingface' via
+a virtual python environment without success, we decided to utilize sentiment
+analysis program from ``bing'' to perform analyses for Model 1. We also utilized three
+other programs (``afinn,'' ``loughran,'' and ``nrc''), and a summary of their positive and
+negative assessments by condition is included in Table 1 at the end of this
+document.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sentimentdata }\OtherTok{\textless{}{-}} \FunctionTok{import}\NormalTok{(}\FunctionTok{here}\NormalTok{(}\StringTok{"data"}\NormalTok{, }\StringTok{"sentiment\_an.xlsx"}\NormalTok{))}
+\NormalTok{sentiment }\OtherTok{\textless{}{-}} \FunctionTok{import}\NormalTok{(}\FunctionTok{here}\NormalTok{(}\StringTok{"data"}\NormalTok{, }\StringTok{"sentiment.xlsx"}\NormalTok{))}
+
+\NormalTok{sentiment\_by\_condition }\OtherTok{\textless{}{-}}\NormalTok{ sentimentdata }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(condition, analysis) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{count}\NormalTok{(sentiment)}
+
+\CommentTok{\# table of sentiment for four groups ("bing", "nrc", "afinn", "loughran")}
+\NormalTok{sentimenttable }\OtherTok{\textless{}{-}} \FunctionTok{import}\NormalTok{(}\FunctionTok{here}\NormalTok{(}\StringTok{"data"}\NormalTok{, }\StringTok{"sentiment\_table.xlsx"}\NormalTok{))}
+\NormalTok{table }\OtherTok{\textless{}{-}}\NormalTok{ sentimenttable[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{, }\DecValTok{2}\SpecialCharTok{:}\DecValTok{11}\NormalTok{]}
+
+\FunctionTok{options}\NormalTok{(}\AttributeTok{kableExtra.auto\_format =} \ConstantTok{FALSE}\NormalTok{)}
+\FunctionTok{library}\NormalTok{(kableExtra)}
+
+
+\NormalTok{table }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{kbl}\NormalTok{(}\AttributeTok{caption =} \StringTok{"Sentiment by analysis tool"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{kable\_classic}\NormalTok{(}\AttributeTok{html\_font =} \StringTok{"Cambria"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{column\_spec}\NormalTok{(}\AttributeTok{column =} \DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{, }\AttributeTok{width =} \StringTok{"0.57in"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{footnote}\NormalTok{(}\AttributeTok{general\_title =} \StringTok{"Note."}\NormalTok{, }\AttributeTok{footnote\_as\_chunk=}\ConstantTok{TRUE}\NormalTok{, }\AttributeTok{threeparttable=}\ConstantTok{TRUE}\NormalTok{, }\AttributeTok{general =} \StringTok{"Positive (Pos) and Negative (Neg) sentiment analysis by individual words using 4 analysis tools: bing, nrc, loughran, and afinn. Results demonstrate that Total Positive \& Negative sentiment was roughly equal by condition (enhance or constrain). However, positive sentiment was slightly higher for the enhance condition and negative sentiment was slight higher for the constrain condition, which is the expected result."}\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-3}Sentiment by analysis tool}
+\caption{(\#tab:sent anal)Sentiment by analysis tool}
 \centering
 \begin{threeparttable}
 \begin{tabular}[t]{>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}}
@@ -389,51 +421,207 @@ Pos bing & Neg bing & Pos nrc & Neg nrc & Pos loughran & Neg loughran & Pos afin
 \hypertarget{model-1-predicting-a-categorical-outcome-sentiment-positive-or-negative-using-regularized-logistic-regression}{%
 \subsection{Model 1: Predicting a Categorical Outcome (sentiment: positive or negative) using Regularized Logistic Regression}\label{model-1-predicting-a-categorical-outcome-sentiment-positive-or-negative-using-regularized-logistic-regression}}
 
-\begin{verbatim}
-## Generalized Linear Model 
-## 
-## 230 samples
-##   6 predictor
-##   2 classes: 'negative', 'positive' 
-## 
-## Recipe steps: zv 
-## Resampling: Cross-Validated (10 fold) 
-## Summary of sample sizes: 207, 207, 207, 207, 207, 207, ... 
-## Resampling results:
-## 
-##   logLoss  
-##   0.6264822
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Recipe for the sentiment dataset}
 
-\begin{verbatim}
-##    negative  positive
-## 1 0.7771235 0.2228765
-## 2 0.5675647 0.4324353
-## 3 0.7771235 0.2228765
-## 4 0.5675647 0.4324353
-## 5 0.5675647 0.4324353
-## 6 0.7771235 0.2228765
-\end{verbatim}
+\NormalTok{outcome }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}sentiment\textquotesingle{}}\NormalTok{)}
 
-\begin{verbatim}
-## [1] 0.02639752
-\end{verbatim}
+\NormalTok{ID }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}id\textquotesingle{}}\NormalTok{)}
 
-\begin{verbatim}
-## [1] 0.6140351
-\end{verbatim}
+\NormalTok{categorical }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}condition\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}source\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}function\textquotesingle{}}\NormalTok{)}
 
-\begin{verbatim}
-## [1] 0.7836039
-\end{verbatim}
+\NormalTok{ blueprint }\OtherTok{\textless{}{-}} \FunctionTok{recipe}\NormalTok{(}\AttributeTok{x  =}\NormalTok{ sentiment,}
+                    \AttributeTok{vars  =} \FunctionTok{c}\NormalTok{(categorical, outcome, ID),}
+                    \AttributeTok{roles =} \FunctionTok{c}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\StringTok{\textquotesingle{}predictor\textquotesingle{}}\NormalTok{,}\DecValTok{3}\NormalTok{), }\StringTok{\textquotesingle{}outcome\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}ID\textquotesingle{}}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{step\_zv}\NormalTok{(}\FunctionTok{all\_of}\NormalTok{(categorical)) }
+
+
+\CommentTok{\# splitting data into training and testing}
+\CommentTok{\# Let the training data have the 80\% of cases and the test data have the 20\% of the cases.}
+
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{11102021}\NormalTok{)  }\CommentTok{\# for reproducibility}
+  
+\NormalTok{sen      }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\FunctionTok{nrow}\NormalTok{(sentiment), }\FunctionTok{round}\NormalTok{(}\FunctionTok{nrow}\NormalTok{(sentiment) }\SpecialCharTok{*} \FloatTok{0.8}\NormalTok{))}
+\NormalTok{sen\_train  }\OtherTok{\textless{}{-}}\NormalTok{ sentiment[sen, ]}
+\NormalTok{sen\_test  }\OtherTok{\textless{}{-}}\NormalTok{ sentiment[}\SpecialCharTok{{-}}\NormalTok{sen, ]}
+
+\CommentTok{\# 10{-}fold cross{-}validation without regularization}
+
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{11152021}\NormalTok{) }\CommentTok{\# for reproducibility}
+
+\NormalTok{sen\_tr }\OtherTok{=}\NormalTok{ sen\_train[}\FunctionTok{sample}\NormalTok{(}\FunctionTok{nrow}\NormalTok{(sen\_train)),]}
+
+  \CommentTok{\# Creating 10 folds with equal size}
+
+\NormalTok{folds }\OtherTok{=} \FunctionTok{cut}\NormalTok{(}\FunctionTok{seq}\NormalTok{(}\DecValTok{1}\NormalTok{,}\FunctionTok{nrow}\NormalTok{(sen\_tr)),}\AttributeTok{breaks=}\DecValTok{10}\NormalTok{,}\AttributeTok{labels=}\ConstantTok{FALSE}\NormalTok{)}
+  
+  \CommentTok{\# Creating the list for each fold }
+\NormalTok{sen.indices }\OtherTok{\textless{}{-}} \FunctionTok{vector}\NormalTok{(}\StringTok{\textquotesingle{}list\textquotesingle{}}\NormalTok{,}\DecValTok{10}\NormalTok{)}
+
+      \ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{)\{}
+\NormalTok{        sen.indices[[i]] }\OtherTok{\textless{}{-}} \FunctionTok{which}\NormalTok{(folds}\SpecialCharTok{!=}\NormalTok{i)}
+\NormalTok{      \}}
+    
+
+\NormalTok{ cv }\OtherTok{\textless{}{-}} \FunctionTok{trainControl}\NormalTok{(}\AttributeTok{method    =} \StringTok{"cv"}\NormalTok{,}
+                   \AttributeTok{index           =}\NormalTok{ sen.indices,}
+                   \AttributeTok{classProbs      =} \ConstantTok{TRUE}\NormalTok{,}
+                   \AttributeTok{summaryFunction =}\NormalTok{ mnLogLoss)}
+    
+      
+\CommentTok{\# Train the model}
+\NormalTok{ caret\_mod }\OtherTok{\textless{}{-}}\NormalTok{ caret}\SpecialCharTok{::}\FunctionTok{train}\NormalTok{(blueprint, }
+                          \AttributeTok{data      =}\NormalTok{ sen\_tr, }
+                          \AttributeTok{method    =} \StringTok{"glm"}\NormalTok{,}
+                          \AttributeTok{family    =} \StringTok{\textquotesingle{}binomial\textquotesingle{}}\NormalTok{,}
+                          \AttributeTok{metric    =} \StringTok{\textquotesingle{}logLoss\textquotesingle{}}\NormalTok{,}
+                          \AttributeTok{trControl =}\NormalTok{ cv)}
+ 
+\CommentTok{\# caret\_mod}
+ 
+ \CommentTok{\# Evaluate the model on the test data}
+
+\CommentTok{\# Predict the probabilities for the observations in the test dataset}
+ 
+\NormalTok{ predicted\_test }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(caret\_mod, sen\_test, }\AttributeTok{type=}\StringTok{\textquotesingle{}prob\textquotesingle{}}\NormalTok{)}
+
+\CommentTok{\# head(predicted\_test)}
+
+
+\CommentTok{\# Evaluate the model on the test dataset}
+\NormalTok{predicted\_te }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(caret\_mod, sen\_test)}
+
+\NormalTok{predicted\_te }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(predicted\_te)}
+\NormalTok{sen\_test\_numeric }\OtherTok{\textless{}{-}}\NormalTok{ sen\_test}\SpecialCharTok{$}\NormalTok{sentiment\_numeric}
+
+
+\NormalTok{predicted\_eval }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(predicted\_te, sen\_test\_numeric)}
+\NormalTok{predicted\_eval }\OtherTok{\textless{}{-}}\NormalTok{ predicted\_eval[}\FunctionTok{complete.cases}\NormalTok{(predicted\_eval), ]}
+
+
+\NormalTok{rsq\_te }\OtherTok{\textless{}{-}} \FunctionTok{cor}\NormalTok{(predicted\_eval}\SpecialCharTok{$}\NormalTok{predicted\_te,predicted\_eval}\SpecialCharTok{$}\NormalTok{sen\_test\_numeric)}\SpecialCharTok{\^{}}\DecValTok{2}
+\CommentTok{\# rsq\_te}
+
+\NormalTok{mae\_te }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(}\FunctionTok{abs}\NormalTok{(predicted\_eval}\SpecialCharTok{$}\NormalTok{sen\_test\_numeric }\SpecialCharTok{{-}}\NormalTok{ predicted\_eval}\SpecialCharTok{$}\NormalTok{predicted\_te))}
+\CommentTok{\# mae\_te}
+
+\NormalTok{rmse\_te }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(}\FunctionTok{mean}\NormalTok{((predicted\_eval}\SpecialCharTok{$}\NormalTok{sen\_test\_numeric }\SpecialCharTok{{-}}\NormalTok{ predicted\_eval}\SpecialCharTok{$}\NormalTok{predicted\_te)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{))}
+\CommentTok{\# rmse\_te}
+\end{Highlighting}
+\end{Shaded}
 
 \hypertarget{results-model-1}{%
 \section{Results Model 1}\label{results-model-1}}
 
 The first model is a regularized logistic regression predicting sentiment type (positive or negative) from a participant's condition (enhance or constrain), source (qualtrics survey or pre-existing study pedagogy) and function (`squeaker' or 'light). Results indicate that pedagogy did not differ significantly in sentiment based upon the condition participants were in\ldots{} Model performance\ldots.
 
-\hypertarget{model-2-k-nearest-neighbors}{%
-\subsubsection{Model 2: K-nearest neighbors}\label{model-2-k-nearest-neighbors}}
+logLoss: 0.626
+rsq\_te: 0.026
+mae\_te: 0.614
+rmse\_te: 0.784
+
+\hypertarget{model-2-k-nearest-neighbors-to-predict-rank-ordered-exploration-promotion-from-pedagogy-text-sample}{%
+\subsubsection{Model 2: K-nearest neighbors to predict rank ordered exploration-promotion from pedagogy text sample}\label{model-2-k-nearest-neighbors-to-predict-rank-ordered-exploration-promotion-from-pedagogy-text-sample}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# import data}
+\CommentTok{\# textdummy \textless{}{-} import(here("data", "text\_data\_dummy.xlsx"))}
+\NormalTok{ textdummy }\OtherTok{\textless{}{-}}\FunctionTok{import}\NormalTok{(}\FunctionTok{here}\NormalTok{(}\StringTok{"data"}\NormalTok{, }\StringTok{"text\_dummy.xlsx"}\NormalTok{))}
+
+\CommentTok{\# train and test split}
+
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{10152022}\NormalTok{) }\CommentTok{\# for reproducibility}
+
+\NormalTok{loc }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\FunctionTok{nrow}\NormalTok{(textdummy), }\FunctionTok{round}\NormalTok{(}\FunctionTok{nrow}\NormalTok{(textdummy) }\SpecialCharTok{*} \FloatTok{0.9}\NormalTok{))}
+\NormalTok{rank\_tr }\OtherTok{\textless{}{-}}\NormalTok{ textdummy[loc, ]}
+\NormalTok{rank\_te }\OtherTok{\textless{}{-}}\NormalTok{ textdummy[}\SpecialCharTok{{-}}\NormalTok{loc, ]}
+
+
+\CommentTok{\# create row indices for 10{-}folds}
+
+  \CommentTok{\#randomly shuffle training data}
+\NormalTok{rank\_tr }\OtherTok{=}\NormalTok{ rank\_tr[}\FunctionTok{sample}\NormalTok{(}\FunctionTok{nrow}\NormalTok{(rank\_tr)),]}
+
+    \CommentTok{\# Create 10 folds with equal size}
+
+\NormalTok{      folds }\OtherTok{=} \FunctionTok{cut}\NormalTok{(}\FunctionTok{seq}\NormalTok{(}\DecValTok{1}\NormalTok{,}\FunctionTok{nrow}\NormalTok{(rank\_tr)),}\AttributeTok{breaks=}\DecValTok{10}\NormalTok{,}\AttributeTok{labels=}\ConstantTok{FALSE}\NormalTok{)}
+  
+    \CommentTok{\# Create the list for each fold }
+      
+\NormalTok{      my.indices }\OtherTok{\textless{}{-}} \FunctionTok{vector}\NormalTok{(}\StringTok{\textquotesingle{}list\textquotesingle{}}\NormalTok{,}\DecValTok{10}\NormalTok{)}
+      \ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{)\{}
+\NormalTok{        my.indices[[i]] }\OtherTok{\textless{}{-}} \FunctionTok{which}\NormalTok{(folds}\SpecialCharTok{!=}\NormalTok{i)}
+\NormalTok{      \}}
+
+\CommentTok{\# Cross{-}validation settings}
+      
+\NormalTok{  cv }\OtherTok{\textless{}{-}} \FunctionTok{trainControl}\NormalTok{(}\AttributeTok{method =} \StringTok{"cv"}\NormalTok{,}
+                     \AttributeTok{index  =}\NormalTok{ my.indices)}
+  
+\FunctionTok{require}\NormalTok{(caret)}
+\FunctionTok{require}\NormalTok{(kknn)}
+
+\FunctionTok{getModelInfo}\NormalTok{()}\SpecialCharTok{$}\NormalTok{kknn}\SpecialCharTok{$}\NormalTok{parameters}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   parameter     class           label
+## 1      kmax   numeric Max. #Neighbors
+## 2  distance   numeric        Distance
+## 3    kernel character          Kernel
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Hyperparameter Tuning Grid}
+  
+\NormalTok{  grid }\OtherTok{\textless{}{-}} \FunctionTok{expand.grid}\NormalTok{(}\AttributeTok{kmax    =} \DecValTok{3}\SpecialCharTok{:}\DecValTok{25}\NormalTok{,}
+                     \AttributeTok{distance =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{),}
+                     \AttributeTok{kernel   =} \FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}epanechnikov\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}rectangular\textquotesingle{}}\NormalTok{))}
+ \CommentTok{\# grid}
+  
+  
+\FunctionTok{require}\NormalTok{(doParallel)}
+
+\NormalTok{ncores }\OtherTok{\textless{}{-}} \DecValTok{8}    
+
+\NormalTok{cl }\OtherTok{\textless{}{-}} \FunctionTok{makePSOCKcluster}\NormalTok{(ncores)}
+
+\FunctionTok{registerDoParallel}\NormalTok{(cl)}
+
+
+\CommentTok{\# Train the model}
+
+\NormalTok{textdummy}\SpecialCharTok{$}\NormalTok{source }\OtherTok{\textless{}{-}} \FunctionTok{as.vector}\NormalTok{(textdummy}\SpecialCharTok{$}\NormalTok{source)}
+\NormalTok{textdummy}\SpecialCharTok{$}\NormalTok{rank }\OtherTok{\textless{}{-}} \FunctionTok{as.vector}\NormalTok{(textdummy}\SpecialCharTok{$}\NormalTok{rank)}
+\NormalTok{textdummy}\SpecialCharTok{$}\NormalTok{condition }\OtherTok{\textless{}{-}} \FunctionTok{as.vector}\NormalTok{(textdummy}\SpecialCharTok{$}\NormalTok{condition)}
+\NormalTok{textdummy}\SpecialCharTok{$}\NormalTok{funct }\OtherTok{\textless{}{-}} \FunctionTok{as.vector}\NormalTok{(textdummy}\SpecialCharTok{$}\NormalTok{funct)}
+\NormalTok{textdummy}\SpecialCharTok{$}\NormalTok{id }\OtherTok{\textless{}{-}} \FunctionTok{as.vector}\NormalTok{(textdummy}\SpecialCharTok{$}\NormalTok{id)}
+
+\NormalTok{outcome }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}rank\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{ID }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}id\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{categorical }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}condition\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}source\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}funct\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{blueprint\_textdummy }\OtherTok{\textless{}{-}} \FunctionTok{recipe}\NormalTok{(}\AttributeTok{x  =}\NormalTok{ textdummy,}
+                    \AttributeTok{vars  =} \FunctionTok{c}\NormalTok{(categorical, outcome, ID),}
+                    \AttributeTok{roles =} \FunctionTok{c}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\StringTok{\textquotesingle{}predictor\textquotesingle{}}\NormalTok{,}\DecValTok{3}\NormalTok{), }\StringTok{\textquotesingle{}outcome\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}ID\textquotesingle{}}\NormalTok{)) }
+
+
+\NormalTok{  caret\_knn }\OtherTok{\textless{}{-}}\NormalTok{ caret}\SpecialCharTok{::}\FunctionTok{train}\NormalTok{(blueprint\_textdummy, }
+                                        \AttributeTok{data      =}\NormalTok{ rank\_tr,}
+                                        \AttributeTok{method    =} \StringTok{"kknn"}\NormalTok{,}
+                                        \AttributeTok{trControl =}\NormalTok{ cv,}
+                                        \AttributeTok{tuneGrid  =}\NormalTok{ grid)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{results-model-2}{%
+\section{Results Model 2}\label{results-model-2}}
 
 \hypertarget{model-3-logistic-regression-predicting-whether-a-particular-object-function-was-discovered}{%
 \subsubsection{Model 3: Logistic regression predicting whether a particular object function was discovered}\label{model-3-logistic-regression-predicting-whether-a-particular-object-function-was-discovered}}
@@ -451,96 +639,11 @@ According to the second lasso model, the optimal lambda value for lasso penalty 
 \hypertarget{find-and-report-the-most-important-10-predictors-of-sentiment-and-their-coefficients.}{%
 \subsubsection{Find and report the most important 10 predictors of sentiment and their coefficients.}\label{find-and-report-the-most-important-10-predictors-of-sentiment-and-their-coefficients.}}
 
-\hypertarget{k-nearest-neighbors-algorithm-to-predict-rank-ordered-exploration-promotion}{%
-\subsection{K-nearest neighbors algorithm to predict rank ordered exploration-promotion}\label{k-nearest-neighbors-algorithm-to-predict-rank-ordered-exploration-promotion}}
-
-\hypertarget{import-data}{%
-\section{import data}\label{import-data}}
-
-textdummy \textless- import(here(``data,'' ``text\_data\_dummy.xlsx''))
-
-\hypertarget{train-and-test-split}{%
-\section{train and test split}\label{train-and-test-split}}
-
-set.seed(10152022) \# for reproducibility
-
-loc \textless- sample(1:nrow(textdummy), round(nrow(textdummy) * 0.9))
-rank\_tr \textless- textdummy{[}loc, {]}
-rank\_te \textless- textdummy{[}-loc, {]}
-
-\hypertarget{create-row-indices-for-10-folds}{%
-\section{create row indices for 10-folds}\label{create-row-indices-for-10-folds}}
-
-\#randomly shuffle training data
-rank\_tr = rank\_tr{[}sample(nrow(rank\_tr)),{]}
-
-\begin{verbatim}
-# Create 10 folds with equal size
-
-  folds = cut(seq(1,nrow(rank_tr)),breaks=10,labels=FALSE)
-
-# Create the list for each fold 
-  
-  my.indices <- vector('list',10)
-  for(i in 1:10){
-    my.indices[[i]] <- which(folds!=i)
-  }
-\end{verbatim}
-
-\hypertarget{cross-validation-settings}{%
-\section{Cross-validation settings}\label{cross-validation-settings}}
-
-cv \textless- trainControl(method = ``cv,''
-index = my.indices)
-
-require(caret)
-require(kknn)
-
-getModelInfo()\(kknn\)parameters
-
-\hypertarget{hyperparameter-tuning-grid}{%
-\section{Hyperparameter Tuning Grid}\label{hyperparameter-tuning-grid}}
-
-grid \textless- expand.grid(kmax = 3:25,
-distance = c(1,2,3),
-kernel = c(`epanechnikov,'`rectangular'))
-grid
-
-require(doParallel)
-
-ncores \textless- 8
-
-cl \textless- makePSOCKcluster(ncores)
-
-registerDoParallel(cl)
-
-\hypertarget{train-the-model}{%
-\section{Train the model}\label{train-the-model}}
-
-outcome \textless- c(`rank')
-
-ID \textless- c(`id')
-
-categorical \textless- c(`condition,' `source,' `function')
-
-blueprint\_textdummy \textless- recipe(x = textdummy,
-vars = c(categorical, outcome, ID),
-roles = c(rep(`predictor,'3), `outcome,' `ID'))
-
-caret\_knn \textless- caret::train(blueprint\_textdummy,
-data = rank\_tr,
-method = ``kknn,''
-trControl = cv,
-tuneGrid = grid)
-
-\hypertarget{results-model-2}{%
-\section{Results Model 2}\label{results-model-2}}
-
 \hypertarget{results-model-3}{%
 \section{Results Model 3}\label{results-model-3}}
 
-\hypertarget{discussion-in-progress}{%
-\section{Discussion (in progress)}\label{discussion-in-progress}}
+\hypertarget{discussion}{%
+\section{Discussion}\label{discussion}}
 
 \newpage
 

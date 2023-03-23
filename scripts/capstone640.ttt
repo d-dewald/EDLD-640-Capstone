@@ -2,7 +2,7 @@
 \ifnextchar[{\eatarg}{}
 
 
-\caption{\label{tab:unnamed-chunk-3}Sentiment by analysis tool}
+\caption{(\#tab:sent anal)Sentiment by analysis tool}
 \centering
 \begin{threeparttable}
 \begin{tabular}[t]{>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}|>{\raggedleft\arraybackslash}p{0.57in}}
